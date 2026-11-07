@@ -171,3 +171,25 @@ From repository root:
 The patch changes ONLY generated standalone `SubProcesses/P*/makefile` files; each original saved as `makefile.before_quirkonium_f2py`. It substitutes the broken `f2py3.10` invocation with the venv interpreter's `python -m numpy.f2py`. It does not edit `matrix.f`, model UFO files, EW input cards, or system symlinks. Use the **same interpreter** for compiling and importing a NumPy extension to avoid 1.x/2.x ABI mismatch.
 
 The next build may expose an actual compiler problem. The wrapper prints full diagnostic errors and writes `matrix2py_environment.json`. Do not claim independent ME validation until it produces **numeric results** and the color/mixing/coupling conventions are audited.
+
+
+## 2026-11-07 follow-up: recovery helper bug fixed
+
+The user successfully installed NumPy 1.26.4, setuptools 68.2.2 and wheel in a project-local venv. The first fixer falsely reported Selected Python: /usr/bin/python3.10; selected NumPy/f2py 1.26.4 2.2.6; and raised ValueError: No f2py3.10 launcher found.
+
+There were TWO BUGS IN OUR HELPER, not a physics failure:
+1. Path(sys.executable).resolve() chased the venv Python symlink to /usr/bin/python3.10; its f2py subprocess then saw system NumPy 2.2.6, not venv NumPy 1.26.4.
+2. The generated Makefile did not contain a literal f2py3.10; this name can be constructed using Makefile variables. The old code incorrectly made literal-string replacement mandatory.
+
+The corrected helper preserves the venv Python path and, when a literal launcher is absent, creates a tiny f2py3.10 executable ONLY in the venv bin directory. The ME compilation helper temporarily prepends that directory to PATH when running make. Original system NumPy, /usr/bin/f2py3.10, MadGraph source, matrix.f and SLHA input cards are unchanged. Added a regression fixture for variable-generated commands.
+
+Run from repo root with the existing venv (no reinstall required):
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    .venv-mg5-f2py/bin/python -c 'import sys,numpy; print(sys.executable,sys.prefix,numpy.__version__)'
+    .venv-mg5-f2py/bin/python scripts/fix_mg5_f2py_makefile.py --apply
+    .venv-mg5-f2py/bin/f2py3.10 -v
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+Expected selected Python path is inside .venv-mg5-f2py/bin and both NumPy/f2py versions should be 1.26.4. This fix is NOT yet executed on the user's machine. If compilation exposes a new error, use the printed compiler diagnostic and saved matrix2py_build.log; do not assume the physics result.
