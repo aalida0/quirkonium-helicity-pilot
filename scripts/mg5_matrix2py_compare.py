@@ -13,6 +13,7 @@ import argparse
 import importlib
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -104,12 +105,26 @@ def compile_extension(work,logdir):
     if candidates:return candidates
     command=["make","matrix2py.so"]
     environment=compiler_environment()
+    # Standalone makefiles may produce f2py3.10 from a make variable, without
+    # spelling the launcher literally in their source. Use the venv-local shim.
+    # Preserve sys.executable: resolving the venv symlink loses the venv ABI.
+    venv_bin=str(Path(os.path.abspath(sys.executable)).parent)
+    build_env=os.environ.copy()
+    build_env["PATH"]=venv_bin+os.pathsep+build_env.get("PATH","")
+    f2py_cmd=shutil.which("f2py3.10",path=build_env["PATH"])
+    environment["build_path_prefix"]=venv_bin
+    environment["f2py3_10_resolved_for_make"]=f2py_cmd
+    if f2py_cmd and Path(f2py_cmd).parent!=Path(venv_bin):
+        raise RuntimeError("Make would invoke the stale system f2py3.10: "+
+            str(f2py_cmd)+". Run .venv-mg5-f2py/bin/python "+
+            "scripts/fix_mg5_f2py_makefile.py --apply first.")
     print("Building standalone Python ME extension:",work,flush=True)
     print("Build environment:",json.dumps(environment,sort_keys=True),flush=True)
     (logdir/"matrix2py_environment.json").write_text(
         json.dumps(environment,indent=2))
     try:
-        proc=subprocess.run(command,cwd=work,capture_output=True,text=True,timeout=240)
+        proc=subprocess.run(command,cwd=work,capture_output=True,text=True,
+                            env=build_env,timeout=240)
     except (OSError,subprocess.TimeoutExpired) as ex:
         raise RuntimeError(f"Cannot compile matrix2py: {ex}") from ex
     output="$ "+" ".join(command)+"\n"+proc.stdout+"\n"+proc.stderr
