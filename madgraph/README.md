@@ -55,3 +55,33 @@ At M=500 GeV and tanβ=3: \(m_{\tilde u}=244.8313730872\) GeV, \(m_{\tilde d}=25
 - Wγ fixed color M² = 0.005042077422755888, corresponding to 0.0016806924742519627 **if** /3.
 
 These numbers are the original analytic prediction, **not independent MG5 observations**. The MSSM_SLHA2 model uses QCD colors unlike the hidden infracolor scalar model. Inspect squark first-generation left/right mixing (e.g. USQMIX, DSQMIX blocks) and all contributing diagrams before treating them as a direct control. Changing external squark masses alone is not enough to establish a consistent full MSSM physical spectrum or an experimental prediction. Use zero-width EW propagators when matching the tree-level analytic amplitudes.
+
+
+## 2026-11-07: SMINPUTS[2] absent in the generated MSSM_SLHA2 card
+
+User's first threshold preflight hit `RuntimeError: lacks required entries {('SMINPUTS', 2)}`, while all 22 existing Python tests passed. The script incorrectly treated `G_F` at SLHA code `SMINPUTS[2]` as universally mandatory and writable. Conventional SLHA2 assigns `G_F` to this entry, but the **generated model's actual external input basis must be checked before editing it**. This is a parameter-card interface blocker, not a new physics discrepancy.
+
+Fix: the default preflight and `--write-cards` now **succeed without GF**, log `SMINPUTS` codes and short snippets from available `Source/MODEL` files, and create review cards `Cards/param_card_quirkonium_review.dat` without modifying the originals. If GF is absent, **`--apply` remains blocked** until the model's EW input scheme is verified. The review copy may NOT have physically matched electroweak couplings.
+
+Run:
+
+```bash
+cd ~/quirkonium-helicity-pilot
+git pull --ff-only origin research/pilot1-literature-model-gate
+python -m unittest discover -s tests -v
+python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3
+python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3 --write-cards
+python - <<'PY'
+import json
+from pathlib import Path
+p=Path("validation/local_logs/threshold_benchmarks/M500_tanbeta3_preflight.json")
+d=json.loads(p.read_text())
+for channel,info in d["channels"].items():
+    print("\nCHANNEL",channel)
+    print("EW audit:",info["electroweak_input_audit"])
+    print("model hints:",info["model_EW_source_hints"][:12])
+    print("default masses:",info["default_MASS"])
+PY
+```
+
+Also inspect the *original* `MG5_UL_DL_WZ/Cards/param_card.dat` `BLOCK SMINPUTS` and generated `Source/MODEL` electroweak parameter handling. Do **not** inject an unregistered external GF value just to satisfy an old preflight assumption, and do **not** run `--apply` or `mg5_evaluate_threshold.py` before EW matching is understood.
