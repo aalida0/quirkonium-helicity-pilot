@@ -65,14 +65,27 @@ class NeutrinoAmbiguityTests(unittest.TestCase):
                     self.assertAlmostEqual(residual,0.,delta=1e-8)
 
     def test_toy_ensemble_closes_truth_analytic_phase(self):
-        low=run_one(500.,.394724021524,3,8,3,[0.])
-        high=run_one(500.,3.,3,8,3,[0.])
-        for row in (low,high):
-            self.assertLess(row["max_truth_angle_closure_radians"],1e-8)
-            self.assertGreater(row["minpz_correct_fraction"],0.)
-            self.assertLessEqual(row["minpz_correct_fraction"],1.)
-            self.assertAlmostEqual(
-                row["truth"]["a1"],row["analytic_closed_a1"],delta=.003)
+        # The 3-node polar quadrature has a known O(0.0032) error in
+        # the polar-angle-integrated cosPhi harmonic at M=500 GeV.
+        # Do NOT relax that numerical error away: explicitly require
+        # a denser rule (5 nodes, 12 azimuths) to improve the result.
+        coarse_low=run_one(500.,.394724021524,3,8,3,[0.])
+        coarse_high=run_one(500.,3.,3,8,3,[0.])
+        low=run_one(500.,.394724021524,5,12,3,[0.])
+        high=run_one(500.,3.,5,12,3,[0.])
+        for coarse,fine in ((coarse_low,low),(coarse_high,high)):
+            self.assertLess(fine["max_truth_angle_closure_radians"],1e-8)
+            self.assertGreater(fine["minpz_correct_fraction"],0.)
+            self.assertLessEqual(fine["minpz_correct_fraction"],1.)
+            err_coarse=abs(
+                coarse["truth"]["a1"]-coarse["analytic_closed_a1"])
+            err_fine=abs(
+                fine["truth"]["a1"]-fine["analytic_closed_a1"])
+            self.assertLess(err_fine,err_coarse,
+                msg="Increasing quadrature order must improve analytic closure")
+            # 5-point Legendre + 12 Phi is sufficiently accurate for
+            # this unit test, but the refined physics pilot is separate.
+            self.assertLess(err_fine,0.0015)
         self.assertGreater(low["truth"]["a1"],0)
         self.assertLess(high["truth"]["a1"],0)
         self.assertLess(sign_cost(low,high,"truth",3),1000)
