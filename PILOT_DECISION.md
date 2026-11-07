@@ -1,6 +1,6 @@
 # Pilot decision — 2026-11-07
 
-**Current decision (2026-11-07 after six-benchmark MG5 grid): CONDITIONAL GO for a scoped physics/novelty pilot; NO-GO for claiming a publishable paper yet. User-run independent MG5 WZ/Wgamma helicity-summed matrix elements PASS 12/12 across six points (worst relative error 1.21e-10); the longitudinal/transverse squared fractions PASS at M500/tanbeta3, but the complex interference phase and novel phenomenological scope are NOT yet certified.**
+**Current decision (2026-11-08 after neutrino-reconstruction feasibility pilot): conditional GO for only a source-matched production-yield and low-tanbeta UV-consistency screen; NO-GO for a standalone a1-plot manuscript or LHC sensitivity claim. Analytic + MG5 WZ/Wgamma and full 2->4 signed interference PASS scoped. User-run low/high scalar branches pass the tree-level doublet D-term mass gate; UV viability UNKNOWN. The min-|pz| truth-MET toy retains opposite a1 signs but dilutes |a1| to ~0.042 at M500; 3σ signal-only contrast needs ~2556 selected trileptons and >77.8 fb effective production at ε=1, or >778 fb at ε=0.1, before backgrounds. Coarse/refined runs do not isolate integration convergence.**
 
 ## Established result
 
@@ -227,3 +227,52 @@ Paper status: NO-GO for manuscript, CONDITIONAL GO only to test
 physical low-tanbeta viability, robust charged-sign reconstruction,
 and plausible bound-state production rate. Stop early if any of
 these decisive gates cannot be supported.
+
+
+### 2026-11-08 latest user-run feasibility results
+
+- User ran 81 Python tests: 80 PASS and one coarse quadrature
+  test failure because a1(3 Legendre nodes, 8 Phi)=0.12351554
+  differs from analytic a1=0.12030511 by 0.00321043,
+  just above hard tolerance 0.003. The test has been **repaired
+  by adding an explicit quadrature convergence check** (3 nodes
+  ->5 nodes, strict 0.0015 closure) rather than relaxing tolerance;
+  revised suite is NOT YET rerun on user workstation.
+- Four tree-level scalar soft-mass points M250/500/1000/2000
+  PASS scoped; tβ_low=0.394724 at M500 has weak-scale
+  type-II-assumed y_t≈2.55. UV consistency UNKNOWN.
+- Fixed wavefunction |R(0)|² at M500 gives low/high
+  Γ(WZ) ratio 0.7890; normalized BR equality does not mean
+  equal absolute rates.
+- Coarse pz toy (5 Legendre nodes, 12 Phi, 5 orientations,
+  rapidities [-1,0,1]): low/high a1=+.0494202/-.0485950
+  for min-|pz|, 3σ Nselected=1892, necessary σprod>57.61 fb
+  at perfect acceptance.
+- Refined but DIFFERENT ensemble (8 nodes, 16 Phi,
+  7 orientations, rapidities [-1.5,-.5,0,.5,1.5]):
+  low/high a1=+.0425996/-.0417345, 3σ Nselected=2556,
+  necessary σprod>77.83 fb at perfect acceptance,
+  >778.3 fb if ε=10% (both before continuum backgrounds).
+  Equal-root average: Δa1=0.025762, Nselected=27414,
+  σprod>834.72 fb even at ε=1.
+- Exact mass-constrained choice reproduces true a1 under
+  PERFECT on-shell masses and momenta; not a detector algorithm.
+- Data do **not** demonstrate stable convergence, since both
+  integration order and boost ensemble changed. Re-run with
+  constant boost/orientation and denser integration before
+  promoting a quantitative dilution factor.
+
+The key issue is **not an amplitude disagreement**: amplitude and
+spin-correlated phase validation remain PASS. It is whether a
+detector-free yet realistic signal production and reconstruction
+model could support enough clean trileptons. The 2025 Forsyth
+model and its 2026 erratum explicitly find existing WZ resonance
+constraints insufficient; this is not a numerical production-rate
+bound for our mass pair.
+
+Primary reproducible gate record:
+validation/FEASIBILITY_USER_RESULTS_2026-11-08.md.
+
+Publication: NO-GO from signed a1 alone. Small STOP/GO
+screen on σ(pp→Ψ±) and source-matched model validity before
+any broader theoretical or collider study.
