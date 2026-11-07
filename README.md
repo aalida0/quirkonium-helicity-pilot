@@ -346,3 +346,47 @@ contradicts the actual 2025 APS bibliography (reference 51).
 Updated crawler has explicit seed-identifier and known-edge integrity
 tests; rerun is required and publication-novelty certification remains
 UNKNOWN.
+
+
+### Latest execution outcome and next commands (2026-11-07)
+
+User-run 69 Python tests all PASS; independent 12/12 two-to-two MG5
+checks PASS; fixed-helicity LL and TT squared amplitudes PASS; 7/7
+two-branch normalized-rate degeneracy tests PASS. The new full
+WZ -> e+ ve mu+ mu- decay-chain standalone generated successfully
+(4 production EW diagrams and two decay vertices); it has NOT YET
+been numerically evaluated. Signed interference a1 is still UNKNOWN
+by an independently generated complete 6-leg amplitude.
+
+INSPIRE first-hop audit reports 2008 paper 67 metadata citations yet
+0 forward results. A code bug was identified: earlier recid search
+used arXiv lookup aliases, e.g. 2504.02940, instead of INSPIRE's
+numeric metadata.control_number. The crawler and regression tests
+were corrected; re-run required. A response without API error is
+not proof that a query was semantically correct.
+
+    cd ~/quirkonium-helicity-pilot
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/inspire_quirkonium_citations.py --depth 1
+    .venv-mg5-f2py/bin/python scripts/mg5_spin_correlated_angles.py         --mass 500 --tanbeta-high 3 --nodes 10 --phis 8
+
+The 6-leg runner compiles a separate matrix2py extension in the
+generated 6-leg standalone; uses new compact cards with NONZERO
+Breit-Wigner W/Z widths; verifies all six external HELAS legs,
+massless outgoing leptons and exact on-shell six-body kinematics;
+evaluates both low/high tanbeta branches on an angular grid.
+It then compares normalized full-MG5 and analytic Phi distributions,
+including signed a1. No original MG5 cards, legacy 2-to-2
+validations or analytic source are overwritten.
+
+Numerical results will appear in
+validation/local_logs/threshold_benchmarks/spin_correlated_3lnu/summary.json.
+If generated external masses/order differ from this narrow setup,
+the runner must fail safely and be corrected from actual source,
+not by post-hoc phase or normalization fitting.
+
+The sign-sensitive two-branch mechanism is LO/scoped. UV viability
+for tanbeta<1, full model-state populations, novel prior art and
+measurability at the LHC remain UNKNOWN. See
+madgraph/SPIN_CORRELATED_3LNU_PLAN.md.
