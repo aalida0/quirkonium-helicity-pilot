@@ -111,3 +111,12 @@ The user ran the preflight for M=500 GeV, tanβ=3; 24 Python tests passed, and r
 Preflight reports check_sa_has_READPS=False for both models. Thus the older check_sa READPS-based evaluator is inapplicable, and **MATRIX ELEMENT STILL UNKNOWN**. The official MG5 standalone Python binding route (make matrix2py.so; initialise the preview card; get_value at user-defined 4-momenta, summing helicities) is now prepared at scripts/mg5_matrix2py_compare.py. No original generated cards need editing. This code has not been run against the actual MG5 models in the current environment; numerical external validation remains UNKNOWN.
 
 Acceptance: values consistent with published scalar amplitude under independent MSSM color factor auditing, correct EW scheme, purely left-handed squark mixing and complete gauge-diagram content. Distinguish measured external-ME values from the analytic /3 candidate targets. No detector, full model physical viability or novelty claim.
+
+
+### Addendum — matrix2py failure root cause confirmed (2026-11-07)
+
+The user supplied the actual WZ `matrix2py_build.log`. It invokes `/usr/bin/f2py3.10`, whose obsolete console-entrypoint requires `numpy==1.21.5` and raises `StopIteration` before any Fortran compiler invocation. Their active Python 3.10.12 / NumPy 2.2.6 and ~/.local/bin/f2py are different from the hard-coded Makefile launcher. GCC/GFortran/Make are present.
+
+This is a **local Python toolchain compatibility failure, not an amplitude disagreement**. Status: generated MG5 WZ/Wgamma process files PASS (user-run); numerical MG5 matrix-element agreement UNKNOWN (blocked before compilation). A reversible generated-Makefile patch script, isolated Python 3.10 NumPy 1.26.4 build requirement, and regression tests were committed. Neither the patched build nor matrix2py result has yet been run on the user's machine.
+
+Required run: create a project-local venv (NumPy 1.26.4, setuptools 68.2.2), patch only the generated standalone Makefiles, compile with that venv, load the matching preview card and evaluate both channels at fixed momenta. Preserve original SLHA cards, check color-average and EW mixing before interpreting a ratio.
