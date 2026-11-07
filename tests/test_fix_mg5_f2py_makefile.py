@@ -64,6 +64,34 @@ class TestMG5F2PYMakefile(unittest.TestCase):
                 self.assertFalse((makefile.parent/
                                   "makefile.before_quirkonium_f2py").exists())
 
+    def test_accept_existing_venv_f2py3_10_from_numpy(self):
+        import numpy
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            prefix=folder/"venv"
+            bindir=prefix/"bin"
+            bindir.mkdir(parents=True)
+            py=str(bindir/"python")
+            original="#!/usr/bin/env python\n# numpy-installed launcher\n"
+            launcher=bindir/"f2py3.10"
+            launcher.write_text(original)
+            launcher.chmod(0o755)
+            for name in ("MG5_UL_DL_WZ","MG5_UL_DL_WA"):
+                makefile=folder/name/"SubProcesses"/"P1"/"makefile"
+                makefile.parent.mkdir(parents=True)
+                makefile.write_text("F2PY = f2py$(PYTHON_VERSION)\n")
+            mocked=Mock(returncode=0,stdout=numpy.__version__+"\n",stderr="")
+            args=["fix_mg5_f2py_makefile.py","--root",str(folder),"--apply"]
+            with (patch.object(sys,"argv",args),
+                  patch.object(sys,"executable",py),
+                  patch.object(sys,"prefix",str(prefix)),
+                  patch.object(sys,"base_prefix","/usr"),
+                  patch("fix_mg5_f2py_makefile.subprocess.run",return_value=mocked),
+                  redirect_stdout(StringIO())):
+                main()
+            self.assertEqual(launcher.read_text(),original)
+            self.assertTrue(launcher.stat().st_mode & 0o111)
+
     def test_preserves_nonf2py_commands(self):
         raw="\tgfortran -c matrix.f\n\tf2py3.10 -c matrix.f\n"
         out,_=replace_launcher(raw,Path("/tmp/venv/bin/python"))
