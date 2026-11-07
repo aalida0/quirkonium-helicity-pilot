@@ -1,6 +1,6 @@
 # Pilot decision — 2026-11-07
 
-**Current decision (2026-11-07 update after fixing legacy SLHA formatting): CONDITIONAL GO for a small, tightly scoped physics/novelty pilot; NO-GO for claiming a new publishable paper yet. The independent MG5 helicity-summed WZ and Wgamma matrix elements agree with the analytic expressions to ~3e-13 relative at M=500 GeV, tanbeta=3.**
+**Current decision (2026-11-07 after six-benchmark MG5 grid): CONDITIONAL GO for a scoped physics/novelty pilot; NO-GO for claiming a publishable paper yet. User-run independent MG5 WZ/Wgamma helicity-summed matrix elements PASS 12/12 across six points (worst relative error 1.21e-10); the longitudinal/transverse squared fractions PASS at M500/tanbeta3, but the complex interference phase and novel phenomenological scope are NOT yet certified.**
 
 ## Established result
 
@@ -163,3 +163,20 @@ New self-contained sources:
 Decision: Conditional GO for mathematical/validation pilot only.
 NO-GO for a manuscript, physical tanbeta-branch claim, experimental
 sensitivity, or novelty assertion until the remaining gates are closed.
+
+
+### 2026-11-07 latest user-run gate: mathematics validated, paper gate open
+
+The original 66 Python tests PASS, six independent MG5 points per two
+channels PASS 12/12 at worst relative difference 1.2026e-10, the
+independent fixed-helicity squares PASS (including f00 at M500/tb3),
+and the 7-point LO two-branch a1 sign flip passes. These are user-run
+results, not a new assistant-run MG5 execution.
+
+The 2008 INSPIRE citing list returned zero even though the 2025 APS paper
+explicitly cites it as ref. 51; the original graph completeness flag
+is therefore not reliable. The crawler now checks this known edge.
+Signed a1 depends on a complex relative helicity phase not independently
+checked by the squared results. Neither branch physical viability
+nor the novelty and collider feasibility of the sign ambiguity have
+been certified. Conditional GO for narrowly testing those gaps only.
