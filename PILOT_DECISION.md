@@ -180,3 +180,50 @@ Signed a1 depends on a complex relative helicity phase not independently
 checked by the squared results. Neither branch physical viability
 nor the novelty and collider feasibility of the sign ambiguity have
 been certified. Conditional GO for narrowly testing those gaps only.
+
+
+## Decision stage launched 2026-11-08: UV-vs-reconstruction feasibility, no detector
+
+The primary-source novelty audit (literature/NOVELTY_AUDIT_INDEPENDENT_2026-11-07.md)
+found generic spin-zero diboson azimuthal interference ALREADY published.
+The exact two-branch charged scalar quirkonium application remains
+a plausible *incremental model-specific* effect, not an independently
+established paper contribution.
+
+A small independent **assistant-side numerical prototype**, NOT the
+newly committed user-local scripts, indicates a nontrivial practical
+warning: exact true-neutrino reconstruction gives |a1|~0.12 at M500,
+but choosing the common smaller-|pz(nu)| W-mass root reduces |a1|
+to ~0.04--0.05 on tested discrete ideal-kinematics ensembles. The
+sign contrast appeared to survive in this exploratory test, but the
+numbers were sensitive to finite angular integration and use no
+production, detector, background, or fiducial model. This is
+PRELIMINARY and **not validated signal reach**.
+
+Next scoped code, awaiting the user's run:
+- scripts/quirkonium_model_domain_gate.py (tree D-term doublet
+  mass origin, Yukawa initial-scale size; full UV remains UNKNOWN).
+- scripts/quirkonium_neutrino_pz_gate.py (exact missing pT two-root
+  kinematic Phi reconstruction and differential moment dilution).
+- tests/test_quirkonium_feasibility_gates.py.
+- validation/FEASIBILITY_STOP_GATES_2026-11-08.md.
+
+The model check is narrowly positive at M500 by independent
+algebra: tβ_low≈0.394724 gives m_uL≈254.719, m_dL≈245.281,
+common m_Q²≈62748 GeV²; tβ_high=3 gives m_uL≈244.831,
+m_dL≈255.169, common m_Q²≈62279 GeV². The user has not yet
+run the new script suite, so do NOT promote these analytic checks
+to a complete implementation PASS. The tree-level common soft mass
+does NOT certify SUSY Higgs/Yukawa RG running or a physically viable
+UV model.
+
+Crucially, equal f00 and normalized BR do **not** imply equal
+absolute partial widths: at M500 and fixed |R(0)|², the low-branch
+Wγ (and WZ) widths have a relative ratio ~0.789 to the high branch.
+We must not claim absolute event-rate degeneracy without source-
+matched production and wavefunction calculations.
+
+Paper status: NO-GO for manuscript, CONDITIONAL GO only to test
+physical low-tanbeta viability, robust charged-sign reconstruction,
+and plausible bound-state production rate. Stop early if any of
+these decisive gates cannot be supported.
