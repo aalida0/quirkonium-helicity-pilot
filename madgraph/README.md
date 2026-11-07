@@ -245,3 +245,19 @@ New audit script scripts/mg5_discrepancy_audit.py reads original and review MASS
     .venv-mg5-f2py/bin/python scripts/mg5_discrepancy_audit.py --mass 500 --tanbeta 3 --probe
 
 The audit saves validation/local_logs/threshold_benchmarks/M500_tanbeta3_discrepancy_audit.json and individual worker logs. No bound-state rate, scan, limits or paper readiness claim until the decisive ME discrepancy is resolved.
+
+
+### Factor-isolation follow-up to the 2026-11-07 MG5 countercheck
+
+The independent MG5 source audit confirms four expected diagrams (contact, W s-channel, and two scalar exchanges), left first-generation USQMIX/DSQMIX=1, and the color result IDEN=9, CF=3 (factor 1/3). At q=0 the MG5 results are invariant under final-state axis rotation, and they change smoothly between q=0, 0.1, 1 GeV. This narrows but does NOT solve the ~1e10/~1e5 mismatches.
+
+The user also found WZ and Wgamma original MSSM card values 0.01292073817016249 and 0.001589724882844364 at their original heavy masses/energy, whereas the modified review card returns 142350088.3299091 and 772.9807959512825. These are not evaluations at equal energies or particle masses; they cannot be compared as isolated input effects.
+
+A new diagnostic script scripts/mg5_parameter_isolation.py creates *temporary SLHA cards* based on the unmodified original, replacing controlled groups of parameters one at a time. It runs MG5 at exactly on-shell kinematics corresponding to each card, then reports original, each single-factor, full-review and leave-one-out cases. Input groups: squark masses, EW masses/alpha_EM, widths, and tanbeta. The intermediate cards are probes only, not viable MSSM spectra. Code and regression test are committed but not yet run on the user's machine.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_parameter_isolation.py 
+        --mass 500 --tanbeta 3 --channel both
+
+Raw input/output manifests: validation/local_logs/threshold_benchmarks/M500_tanbeta3_parameter_isolation.json, with subprocess worker logs for each case. No source Fortran, original SLHA card or analytical formula is modified. No benchmark PASS/physical claim can be made until the cause is understood.
