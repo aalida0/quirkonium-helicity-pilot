@@ -132,3 +132,24 @@ New self-contained sources:
 Decision: Conditional GO for mathematical/validation pilot only.
 NO-GO for a manuscript, physical tanbeta-branch claim, experimental
 sensitivity, or novelty assertion until the remaining gates are closed.
+
+
+### Source clarification and additional hard limitation — 2026 erratum
+
+The 2026 erratum explicitly describes the range 0.1 <= tanbeta <= 10
+as effectively covering its *physically meaningful* D-term-splitting
+parameter space and presents bounds separately for tanbeta<1 and >1;
+see Forsyth et al., PRD 113, 079901 (2026), DOI:10.1103/lwnc-cmpn,
+corrected Eq. (3.4), Figs. 4–6. This strengthens the justification
+for **considering** a tanbeta_low=0.395 branch within the simplified
+phenomenological treatment. But the original 2025 source introduces
+tanbeta as the SUSY Higgs VEV ratio with tanbeta>1 (Sec. 3, original
+text around Eq. 3.2). A UV-complete or phenomenologically qualified
+two-branch model remains UNKNOWN and must not be silently assumed.
+
+The two solutions match f00 and **normalized BR(WZ) under the assumed
+two-channel ground state**, NOT generally the absolute Gamma(WZ) or
+Gamma(Wgamma): those rates can differ via D(Delta) and through the
+unknown bound-state wavefunction. No rate-/cross-section-based
+statistical likelihood or physically matched production claim has
+been made. A competing-model contrast must take this into account.
