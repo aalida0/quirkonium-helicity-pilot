@@ -197,3 +197,18 @@ The new read-only parameter-factor experiment isolates which type of card edit t
     .venv-mg5-f2py/bin/python scripts/mg5_parameter_isolation.py --mass 500 --tanbeta 3 --channel both
 
 Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_parameter_isolation.json. The resulting temporary MSSM spectra may be inconsistent and are used ONLY to diagnose the generated amplitude. This does not alter original cards or establish physical viability. Publication/quantitative physics gates remain NO-GO pending resolution.
+
+
+### 2026-11-07: EW-input anomaly, and a second card-reconstruction discrepancy
+
+MG5 factor study: original WZ/Wgamma ME² = 0.01292 / 0.001590; squark-masses-only = 0.06833 / 0.001725; EW-only (SMINPUTS[1], MASS[24]/[23]) = 7593 / 29.04. Full excluding EW returns ~0.06833 / 0.001725. Thus EW changes are essential to the large enhancement.
+
+But the factor-study's reconstructed full-review card yields WZ/Wgamma = 6.805e6 / 173.735, while the directly evaluated exact preflight review card yields 1.4235e8 / 772.981. These values are NOT reconciled and must not be treated as identical setups. The input parser/card layout needs an exact-vs-reconstructed audit.
+
+A focused script, using temporary cards and existing matrix2py, now splits electroweak changes into independent SMINPUTS[1] (aEWM1), MASS[24] (MW), their combination, and the unmodified MZ case. It also runs exact preflight review vs two reconstructed versions at matched 4-momenta, reports numerical differences in all supported SLHA scalar entries, and saves text diffs. It does not edit physics source/model or canonical cards.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_ew_input_audit.py --mass 500 --tanbeta 3 --probe
+
+Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_ew_isolation.json. Physics validation decision remains NO-GO until a genuine common-setup ME agreement is established.
