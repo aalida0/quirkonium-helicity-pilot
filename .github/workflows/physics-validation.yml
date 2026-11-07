@@ -14,5 +14,7 @@ jobs:
           python-version: '3.11'
       - name: Run full amplitude and reference checks
         run: |
+          python -m py_compile scripts/inspire_twohop.py scripts/compare_wolfram.py
+          python scripts/inspire_twohop.py --help > /dev/null
           python -m unittest discover -s tests -v
           python src/scalar_threshold_amplitudes.py
