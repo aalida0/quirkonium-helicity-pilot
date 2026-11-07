@@ -9,7 +9,7 @@
 | arXiv/APS | Fok & Kribs 1106.3101 | Appendices A and B | fermionic bound-state projectors and Wγ/WZ widths |
 | arXiv/APS | Forsyth et al. 2504.02940 | Section 3 and Appendix A.3 | full scalar Wγ/WZ integrated formulas and model |
 | APS erratum | DOI:10.1103/lwnc-cmpn | text and corrected Eq.(3.4) | \(\Delta=m_W^2\cos(2\beta)/M\); 0.1 <= tanβ <= 10; 2025 unconstrained plots corrected |
-| BYU ScholarsArchive | 'Characterizing Quirky Signals' Joshua D. Forsyth | thesis §4 and Fig.4.2 excerpts | **2023 analytic charged scalar Wγ/WZ amplitudes and BR mass-splitting plot**; publication overlap stronger than original audit |
+| BYU ScholarsArchive | 'Characterizing Quirky Signals' Joshua D. Forsyth | thesis §4.2.1, Eqs. (4.2.12a,b), and Fig.4.2 excerpts | **2023 analytic charged scalar Wγ/WZ amplitudes, angular-momentum state argument, and BR mass-splitting plot**; publication overlap stronger than original audit |
 | arXiv | Burdman et al. 0805.4667 | charged scalar Wγ/WZ rate sections | 2008 precedents for S-wave charged squirkonium rates |
 | alphaXiv | semantic discovery on charged quirkonium helicity/polarization and WZ | top hits 2026-11-07 | retrieved core papers and SM WZ polarization studies, no exact match identified in top hits; not exhaustive |
 | Web indexing | terms quirkonium/squirkonium + WZ + helicity/polarization; source title DOI and thesis title | targeted result pages | not exhaustive; relevant original papers and thesis identified |
@@ -41,3 +41,6 @@
 - Log date, exact request, hit count, pagination pages, relevant exclusion rationale, inaccessible papers.
 
 **Do not assert complete citation-network coverage or novelty certification.** The above blocked tools do not supply evidence of an absence of literature. 
+
+### Added source locator
+The 2023 Forsyth MS thesis specifically displays charged-squirkonium WZ coefficient functions at **Eqs. (4.2.12a,b)** and the Wγ coefficient in the same discussion, with charged Wγ/WZ branching-fraction comparison in **Fig. 4.2**. Source: https://physics.byu.edu/docs/thesis/1674. Be cautious: its sign convention for the mass splitting may differ from the 2025 paper. The exact equation comparison requires fixing the Δ definition before transplanting formulae.
