@@ -223,3 +223,25 @@ The script fails safely if no original ident_card exists anywhere in the standal
     grep -RIn 'ident_card.dat' validation/local_logs/MG5_UL_DL_WZ/Source | head -25
 
 The independent MG5 matrix-element PASS remains **UNKNOWN** until we obtain numerical ME2 values from both channels and verify EW/mixing/color normalization. The existence of a compiled matrix2py.so is a toolchain success only.
+
+
+## 2026-11-07: Numerical matrix-element comparison FAIL (root cause unknown)
+
+User successfully compiled and ran MG5_aMC 3.5.1 MSSM_SLHA2 scalar scattering matrix elements with NumPy 1.26.4 f2py. Original generated Cards/ident_card.dat was symlinked in the standalone P* directory; both initialisemodel and get_value returned actual numbers at M=500 GeV, tanbeta=3:
+
+| Channel | MG5 averaged ME2 (observed) | Analytic /3 target (assumed color) | MG5 / analytic |
+|---|---:|---:|---:|
+| WZ | 142350088.3299091 | 0.005317520079460985 | 26770014255.3 |
+| Wgamma | 772.9807959512825 | 0.001680692474251963 | 459918.044374 |
+
+Numerical benchmark comparison = FAIL; root cause UNKNOWN. These ratios cannot be attributed to a factor-three color average or modest EW scheme mismatch. Do not fudge a normalization, assume Python/Mathematica are correct or extrapolate these values to a physical bound state. Audit model inputs, mixing, diagrams, phase space and Fortran interface.
+
+The numerical values are user-reported, and local raw JSON evidence exists at validation/local_logs/threshold_benchmarks/M500_tanbeta3_{Z,gamma}/matrix2py_result.json. Mathematica/Python agreement remains only a narrower internal-consistency and published-width check.
+
+New audit script scripts/mg5_discrepancy_audit.py reads original and review MASS/SMINPUTS, charged Higgs mass, USQMIX/DSQMIX, matrix.f graph/color/averaging/HELAS calls and EW source hints. Optional --probe runs on-shell MG5 evaluations at q=0 with two final-state orientations, q=0.1 GeV and 1 GeV, and with the unmodified original MSSM card at its own threshold, without modifying SLHA or model files. A scalar pair at rest must be rotationally invariant.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_discrepancy_audit.py --mass 500 --tanbeta 3 --probe
+
+The audit saves validation/local_logs/threshold_benchmarks/M500_tanbeta3_discrepancy_audit.json and individual worker logs. No bound-state rate, scan, limits or paper readiness claim until the decisive ME discrepancy is resolved.
