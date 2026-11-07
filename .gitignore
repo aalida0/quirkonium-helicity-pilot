@@ -8,3 +8,6 @@ __pycache__/
 validation/inspire_audit*/raw_api/
 validation/inspire_audit*/inspire_audit.json
 validation/local_logs/
+
+# Isolated MG5 f2py build environment
+.venv-mg5-f2py/
