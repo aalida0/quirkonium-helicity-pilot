@@ -182,3 +182,18 @@ Reproduce the diagnostic scan and generated-source audit (does not alter model, 
     .venv-mg5-f2py/bin/python scripts/mg5_discrepancy_audit.py --mass 500 --tanbeta 3 --probe
 
 The read-only audit extracts original/review SLHA masses and mixing, generated diagrams/color factors and direct MG5 ME values at q=0 (both final-state orientations), q=0.1, 1 GeV and the unmodified original MSSM card. It writes validation/local_logs/threshold_benchmarks/M500_tanbeta3_discrepancy_audit.json. Do not claim physical helicity fractions from this model as externally validated until this countercheck is reconciled.
+
+
+### 2026-11-07: Narrowed MG5 discrepancy after rotation/color/model audit
+
+User's generated MSSM_SLHA2 matrix.f has NGRAPHS=4 with the expected scalar-contact, W*, up/down scalar-exchange HELAS calls. For both channels: IDEN=9, CF=3, HELAVGFACTOR=1, so for the single color-diagonal amplitude the initial-color average is 1/3. First-generation USQMIX and DSQMIX are unmixed. The exact threshold ME is rotation invariant and varies smoothly at q=0.1 and 1 GeV; those checks eliminate several normalization/kinematic suspicions, but not the very large physical-model discrepancy.
+
+User-reported original MSSM card result: WZ ME2 0.01292073817 and Wgamma ME2 0.00158972488. At the modified M=500 GeV/tanbeta=3 review card: WZ 142350088.3299091; Wgamma 772.9807959512825. The original and review inputs have different mass scales, so this is a clue only, NOT a controlled same-kinematics comparison.
+
+The new read-only parameter-factor experiment isolates which type of card edit triggers the enhancement using the same exact MadGraph generator and transient SLHA copies. It varies squark masses, EW inputs, particle widths and tanbeta independently, using correct on-shell scattering kinematics for each modified spectrum:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_parameter_isolation.py --mass 500 --tanbeta 3 --channel both
+
+Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_parameter_isolation.json. The resulting temporary MSSM spectra may be inconsistent and are used ONLY to diagnose the generated amplitude. This does not alter original cards or establish physical viability. Publication/quantitative physics gates remain NO-GO pending resolution.
