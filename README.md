@@ -1,7 +1,7 @@
 # Charged quirkonium polarization — scalar helicity feasibility pilot
 
 **Research date:** 2026-11-07. **Branch:** research/pilot1-literature-model-gate.
-**Status (final 2026-11-07 scoped cross-check): MG5_aMC 3.5.1 independently reproduces both helicity-summed WZ and Wgamma matrix elements at M=500 GeV, tanbeta=3, to ~3e-13 relative. Prior huge mismatches were caused by 21-character SLHA numeric fields; controlled identical-card A/B confirmed an exact 10000x artifact. Physics amplitude gate PASS for this benchmark; independent helicity phases, model viability and publication novelty remain UNKNOWN. No experimental-reach or paper-ready claim.**
+**Status (updated 2026-11-07 after expanded pilot): 66 Python tests PASS; six-point independent MG5 WZ/Wgamma benchmark grid PASS 12/12 (maximum relative error 1.21e-10); independent longitudinal/transverse squared-amplitude check PASS at M500/tanbeta3. The 21-character SLHA formatting artifact is resolved. Seven LO pairs with equal f00 and normalized BR(WZ) but opposite signed a1 PASS mathematically. Complex helicity relative phases, tanbeta<1 model viability, literature novelty and collider reach remain UNKNOWN. No paper-ready claim.**
 
 ## What has been calculated
 
@@ -298,3 +298,20 @@ New self-contained sources:
 Decision: Conditional GO for mathematical/validation pilot only.
 NO-GO for a manuscript, physical tanbeta-branch claim, experimental
 sensitivity, or novelty assertion until the remaining gates are closed.
+
+
+### 2026-11-07 latest user-run gate: mathematics validated, paper gate open
+
+The original 66 Python tests PASS, six independent MG5 points per two
+channels PASS 12/12 at worst relative difference 1.2026e-10, the
+independent fixed-helicity squares PASS (including f00 at M500/tb3),
+and the 7-point LO two-branch a1 sign flip passes. These are user-run
+results, not a new assistant-run MG5 execution.
+
+The 2008 INSPIRE citing list returned zero even though the 2025 APS paper
+explicitly cites it as ref. 51; the original graph completeness flag
+is therefore not reliable. The crawler now checks this known edge.
+Signed a1 depends on a complex relative helicity phase not independently
+checked by the squared results. Neither branch physical viability
+nor the novelty and collider feasibility of the sign ambiguity have
+been certified. Conditional GO for narrowly testing those gaps only.
