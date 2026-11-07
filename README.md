@@ -69,9 +69,9 @@ Run the INSPIRE graph retrieval (Internet required):
 
 Generate the MadGraph standalone *EW control* from the repository root:
 
-    export MG5_BIN=/absolute/path/to/MG5_aMC/bin/mg5_aMC
+    export MG5_BIN="$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC"
     ( cd validation/local_logs && "$MG5_BIN" ../../madgraph/mssm_ew_procs.mg5 ) |& tee validation/local_logs/madgraph_generation.log
 
 **Important:** successful MG process generation does not demonstrate the amplitude is correct. A fixed-color, fixed-helicity matrix-element benchmark, parameter card and threshold extrapolation must be compared numerically and logged before the MG gate can be PASS. Never equate QCD-colored MSSM squarks with infracolor squirks for production.
 
-Existing Python tests were rerun locally: 14 PASS. New scripts passed Python syntax/offline logic checks, but no Wolfram/MG5 executable or live INSPIRE API access was available here. Hence the three independent gates remain UNKNOWN.
+The user executed the original Mathematica tensor/width/Ward script on 2026-11-07: it printed PASS but also `N::meprec` precision warnings. Nine `f00,a1,a2` rows were independently compared against the Python implementation (largest absolute deviation `1.82e-14`). This establishes a **scoped numerical Mathematica/Python comparison**, not a clean 1e-22 precision certification or an independent MG5 generator check. The original comparator crashed because it tried importing `polarization_fraction` rather than the actual `f00` API; fixed, with Mathematica precision-suffix handling and a regression fixture. The revised 60-digit Wolfram script still needs a clean rerun. MG5 and live INSPIRE runs remain UNKNOWN. Running `python -m unittest discover -s tests -v` now also checks the stored nine-point Mathematica fixture.
