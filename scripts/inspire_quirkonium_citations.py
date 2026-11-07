@@ -83,12 +83,32 @@ def fetch_json(url,timeout=20):
             if retry<2:time.sleep(retry+1)
     raise RuntimeError(f"GET {url} failed: {last}")
 
+def canonical_recid(hit):
+    """INSPIRE's *internal numeric* literature recid, never its arXiv alias.
+
+    GET /api/arxiv/2504.02940 may report id='2504.02940' for
+    external-identifier lookup. Searching refersto:recid:2504.02940
+    is not the documented syntax for the corresponding paper.
+    The canonical numeric id is metadata.control_number; prefer it.
+    """
+    meta=hit.get("metadata",{})
+    for value in (meta.get("control_number"),hit.get("id")):
+        if isinstance(value,(int,str)) and str(value).strip().isdigit():
+            return str(value).strip()
+    for name in ("literature","self"):
+        link=(hit.get("links") or {}).get(name,"")
+        found=re.search(r"/(?:api/)?literature/(\d+)(?:[/?#]|$)",str(link))
+        if found:return found.group(1)
+    raise RuntimeError(
+        f"INSPIRE record has no canonical numeric literature recid: "
+        f"id={hit.get('id')!r}, control_number={meta.get('control_number')!r}")
+
 def small_record(hit):
     meta=hit.get("metadata",{})
     titles=meta.get("titles") or []
     arxiv=meta.get("arxiv_eprints") or []
     doi=meta.get("dois") or []
-    return {"recid":str(hit.get("id",meta.get("control_number",""))),
+    return {"recid":canonical_recid(hit),
             "title":titles[0].get("title","") if titles else "",
             "arxiv":[x.get("value") for x in arxiv if x.get("value")],
             "doi":[x.get("value") for x in doi if x.get("value")],
@@ -147,10 +167,12 @@ def main():
         entry={"arxiv":arxiv,"status":"INCOMPLETE"}
         try:
             record=fetch_json(f"{API}/arxiv/{quote(arxiv)}")
-            if not record.get("id"):raise ValueError("Seed lacks INSPIRE recid")
+            recid=canonical_recid(record)
             entry["metadata"]=small_record(record)
+            entry["lookup_id"]=str(record.get("id",""))
+            entry["canonical_recid"]=recid
             entry["backward"]=references(record)
-            entry["forward"]=citations(record["id"],args.max_pages)
+            entry["forward"]=citations(recid,args.max_pages)
             entry["status"]="COMPLETE" if entry["forward"]["complete"] else "INCOMPLETE"
             for hit in entry["forward"]["items"]:
                 if RELEVANT.search(hit["title"]):
