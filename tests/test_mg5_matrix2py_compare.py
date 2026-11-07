@@ -44,7 +44,7 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
             (p/"SubProcesses"/"P1_control").mkdir(parents=True)
             (p/"Source/MODEL").mkdir(parents=True)
             (p/"Cards/param_card.dat").write_text(card)
-            (p/"Cards/param_card_quirkonium_review.dat").write_text(matched)
+            (p/"Cards/param_card_quirkonium_review_compact.dat").write_text(matched)
             (p/"SubProcesses/P1_control/matrix.f").write_text(
                 "      SUBROUTINE SMATRIX(P,ANS)\n")
             (p/"Source/MODEL/param_read.inc").write_text(
@@ -131,7 +131,7 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
     def test_rejects_unregistered_gf_injected_into_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             base=self.make_fixture(tmp)
-            path=base/"MG5_UL_DL_WZ/Cards/param_card_quirkonium_review.dat"
+            path=base/"MG5_UL_DL_WZ/Cards/param_card_quirkonium_review_compact.dat"
             original=path.read_text()
             path.write_text(original.replace(
                 " 3 1.180000E-1", " 2 1.166370E-5\n 3 1.180000E-1"))
@@ -141,7 +141,7 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
     def test_rejects_unmatched_electromagnetic_input(self):
         with tempfile.TemporaryDirectory() as tmp:
             base=self.make_fixture(tmp)
-            path=base/"MG5_UL_DL_WA/Cards/param_card_quirkonium_review.dat"
+            path=base/"MG5_UL_DL_WA/Cards/param_card_quirkonium_review_compact.dat"
             path.write_text(path.read_text().replace(
                 f"{1/(ALPHA_W*S2):.15E}","1.279340E+02"))
             with self.assertRaisesRegex(RuntimeError,"Review card mismatches"):
