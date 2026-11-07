@@ -95,7 +95,7 @@ def reference_channels(base):
 def bench_label(m,tb):
     return f"M{m:g}_tanbeta{tb:g}"
 
-def evaluate_point(channel,base,compiled,m,tb):
+def evaluate_point(channel,base,compiled,m,tb,tolerance=NUMERIC_TOL):
     b=Setup(m,splitting(m,tb),channel)
     ps=momenta(b)
     validate_ps(ps,[b.mu,b.md,MW,b.mv])
@@ -119,9 +119,9 @@ def evaluate_point(channel,base,compiled,m,tb):
           "analytic_fixed_color_me2":fixed,
           "analytic_avg_me2":expected,"signed_rel":rel,
           "abs_rel":abs(rel),
-          "numeric_tolerance":NUMERIC_TOL,
+          "numeric_tolerance":tolerance,
           "numeric_status":("PASS" if math.isfinite(rel) and
-                           abs(rel)<=NUMERIC_TOL else "FAIL")}
+                           abs(rel)<=tolerance else "FAIL")}
     (folder/"comparison.json").write_text(json.dumps(data,indent=2))
     return data
 
@@ -133,8 +133,6 @@ def main():
     parser.add_argument("--stop-on-fail",action="store_true")
     args=parser.parse_args()
     if args.tolerance<=0:parser.error("tolerance must be positive")
-    global NUMERIC_TOL
-    NUMERIC_TOL=args.tolerance
     base=args.root.expanduser().resolve()
     generated=reference_channels(base)
     channels=("Z","gamma") if args.channel=="both" else (args.channel,)
@@ -146,7 +144,7 @@ def main():
         row={"M":m,"tanbeta":tb,"channels":{}}
         for channel in channels:
             try:
-                record=evaluate_point(channel,base,generated,m,tb)
+                record=evaluate_point(channel,base,generated,m,tb,args.tolerance)
             except Exception as exc:
                 record={"channel":channel,"numeric_status":"ERROR","error":str(exc)}
             row["channels"][channel]=record
