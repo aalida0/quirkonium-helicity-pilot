@@ -155,3 +155,17 @@ If the previous helper printed /usr/bin/python3.10 and then raised No f2py3.10 l
     .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
 
 No global Python packages, MG5 installation or original parameter cards are changed. This is a tooling fix, not yet an independent numerical ME validation.
+
+
+### matrix2py initialization / ident_card.dat (2026-11-07)
+
+Both MG5 standalone Fortran extensions compile under the isolated NumPy 1.26.4 venv, but user-run initialisemodel printed a warning about missing ident_card.dat in parent directories and terminated without a matrix element. The wrapper originally ran from the repository root, rather than the generated P* working directory.
+
+The updated evaluator finds the genuine generated ident_card.dat and stages a symlink in the P* working directory if necessary, then runs initialisemodel/get_value in a child process with that cwd. A fresh worker result file is mandatory, preventing a Fortran STOP with exit code 0 from being reported as successful physics.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+If the standalone has no ident_card.dat, the script stops with an explicit find command; do not create an empty mapping. The independent numerical matrix-element gate remains UNKNOWN.
