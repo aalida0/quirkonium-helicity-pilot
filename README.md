@@ -212,3 +212,24 @@ A focused script, using temporary cards and existing matrix2py, now splits elect
     .venv-mg5-f2py/bin/python scripts/mg5_ew_input_audit.py --mass 500 --tanbeta 3 --probe
 
 Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_ew_isolation.json. Physics validation decision remains NO-GO until a genuine common-setup ME agreement is established.
+
+
+### Potential root cause found: too-long numeric fields in generated SLHA preview (2026-11-07)
+
+The one-at-a-time EW-input audit gives a striking result: changing only aEWM1 from 127.934 to 132.6638757554207 multiplied the MG5 ME2 in BOTH WZ and Wgamma by 9299.649824 (same to better than 1e-10 relative). This is numerically equal to the fourth power of the gauge-coupling ratio if the 21-character field 1.326638757554207E+02 were incorrectly interpreted as 1.326638757554207E+0 due to a 20-column truncation. This is a strong input-parsing hypothesis, NOT yet a directly demonstrated parser defect.
+
+The previous Python serializer wrote 21-character values using .15E. The corrected serializer writes <=20-character .12E fields, retaining roughly 13 significant digits, and saves new Cards/param_card_quirkonium_review_compact.dat for each process, preserving old Cards/param_card_quirkonium_review.dat for the A/B test. The ME comparator now requires the new compact card.
+
+Run the decisive controlled same-physics A/B test (legacy wide alpha field vs compact field at the same original MSSM momenta) and new benchmark:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3 --write-cards
+    .venv-mg5-f2py/bin/python scripts/mg5_slha_fieldwidth_gate.py --mass 500 --tanbeta 3 --channel both
+
+Then, only after confirming numerical input handling, retry the matrix element comparison using the compact benchmark cards:
+
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+Expected mathematical signature for a clipped original aEWM1 127.934: unsafe 21-character rewrite produces 10000 times the original amplitude squared, while the compact rewrite produces the same value. This signature requires verification with the actual Fortran code; no numeric MG5 PASS or publication claim is yet authorized. Outputs stored at validation/local_logs/threshold_benchmarks/M500_tanbeta3_slha_width_gate.json.
