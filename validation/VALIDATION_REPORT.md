@@ -127,3 +127,10 @@ Required run: create a project-local venv (NumPy 1.26.4, setuptools 68.2.2), pat
 The user installed isolated NumPy 1.26.4 and setuptools 68.2.2. The first fixer failed with ValueError: No f2py3.10 launcher found, printing Selected Python: /usr/bin/python3.10 and NumPy/f2py 1.26.4 2.2.6. This was caused by our incorrect use of Path(sys.executable).resolve(), which chased the virtualenv symlink to the system interpreter for the subprocess. The absent literal f2py3.10 in the generated Makefile may result from a Makefile variable expansion. It is NOT evidence that f2py is unavailable.
 
 Code now preserves sys.executable's virtualenv path, creates a venv-local f2py3.10 shim for variable-expanded launcher invocation, and prepends venv bin to PATH for make. Regression test covers the variable-based Makefile. Fixes are prepared but not yet re-executed by user. Independent MG5 numeric amplitude gate remains UNKNOWN; Mathematica comparison remains PASS at numerical precision.
+
+
+### Addendum — standalone .so compilation PASS; ident_card initializer blocked (user run)
+
+Both user-executed MG5_aMC 3.5.1 matrix2py builds succeeded in a local Python 3.10 / NumPy 1.26.4 venv. On invoking matrix2py.initialisemodel with the review SLHA card from the repository root, both channels emitted the warning 'file ident_card.dat not found in the parent directories!(lha_read)' and exited without get_value or raw ME2. These are premature Fortran initialization exits, not amplitude disagreements.
+
+Code correction committed, not yet user-tested: run matrix2py from the generated SubProcesses/P* cwd (official MG5 example context); find an actual generated ident_card.dat and, if it is outside the parent lookup, symlink to it in P*. Never fabricate model metadata or silently overwrite existing files. Evaluate through an isolated worker and require fresh numerical output JSON (Fortran STOP can exit with status 0). User-run independent MG5 numeric gate remains UNKNOWN until raw ME2 numbers are recorded and normalized.
