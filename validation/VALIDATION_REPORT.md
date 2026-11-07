@@ -102,3 +102,12 @@ This is **not an amplitude-level physics failure**. The preflight's assumption t
 **Code fix committed, not yet user-run:** make missing `SMINPUTS[2]` nonfatal for read-only/report and `--write-cards` review copies; record present SMINPUTS codes and the generated model's EW source clues; keep `--apply` **blocked** when the EW scheme is unknown. Regression tests added using synthetic GF-missing SLHA cards. Because the model's external EW basis and numerical generated matrix elements are unverified, **MG5 numerical physics validation remains UNKNOWN**. Do not manufacture a GF entry or imply a new physics discrepancy.
 
 User-machine next gate: rerun preflight, inspect `electroweak_input_audit` and `model_EW_source_hints` in the JSON, then decide which external independent EW inputs must be matched. Only after that may we compile and compare a fixed-color threshold SMATRIX with the analytic target.
+
+
+### Addendum — model external-input and READPS inspection (user run)
+
+The user ran the preflight for M=500 GeV, tanβ=3; 24 Python tests passed, and read-only analysis plus --write-cards created **review-only** input cards. Both Z and γ generated MSSM_SLHA2 cards show SMINPUTS keys [1,3], not [2], and initial up/down squark masses 561.119/568.4411 GeV, MW=79.82901 GeV, MZ=91.1876 GeV. The generated Source/MODEL/param_read.inc uses LHA_GET_REAL for aEWM1 and mdl_MW, supporting a two-input MW/alpha_EM EW scheme, but the derived sinθ_W and g relation still requires explicit model source or amplitude agreement. Generic absent GF is **not evidence of failed or incomplete model loading**.
+
+Preflight reports check_sa_has_READPS=False for both models. Thus the older check_sa READPS-based evaluator is inapplicable, and **MATRIX ELEMENT STILL UNKNOWN**. The official MG5 standalone Python binding route (make matrix2py.so; initialise the preview card; get_value at user-defined 4-momenta, summing helicities) is now prepared at scripts/mg5_matrix2py_compare.py. No original generated cards need editing. This code has not been run against the actual MG5 models in the current environment; numerical external validation remains UNKNOWN.
+
+Acceptance: values consistent with published scalar amplitude under independent MSSM color factor auditing, correct EW scheme, purely left-handed squark mixing and complete gauge-diagram content. Distinguish measured external-ME values from the analytic /3 candidate targets. No detector, full model physical viability or novelty claim.
