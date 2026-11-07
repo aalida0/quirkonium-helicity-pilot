@@ -20,13 +20,15 @@ Local verification in Python 3.13.5: **14 tests PASS**, including 70 WZ/Wγ publ
 
     python -m pip install -r requirements-figures.txt
     python src/make_figures.py
+    python src/make_joint_figures.py
 
-Plots generated: figures/f00_vs_tanbeta.png, figures/w_lepton_angle.png, figures/published_width_validation.png. The figures folder is generated output (not required for the source code).
+Plots generated: figures/f00_vs_tanbeta.png, figures/w_lepton_angle.png, figures/published_width_validation.png, figures/a1_cosPhi_vs_tanbeta.png, figures/joint_decay_plane_azimuth.png. The figures folder is generated output (not required for the source code).
 
 ## Docs and gatekeepers
 - MODEL_SPECIFICATION.md — field content, couplings, mass splitting, non-viability caveats
 - theory/amplitudes.md — explicit tree diagram sum, phase space and source formula
 - theory/helicity_conventions.md — definitions and ideal W lepton polar angle
+- theory/joint_angular_interference.md — complete ideal WZ angular density and interference moments
 - literature/PRIOR_ART_MATRIX.md — including Forsyth 2023 MS thesis
 - literature/CITATION_AUDIT.md — literature coverage and honest API/quota blockers
 - literature/NOVELTY_VERDICT.md — incomplete novelty status
@@ -37,7 +39,7 @@ Source: Forsyth et al. (2025), arXiv:2504.02940, Appendix A.3, and 2026 erratum 
 
 ## What has **not** been finished
 
-No direct complete two-hop INSPIRE citation graph (API unavailable, scholarly connector quota); no independently generated UFO/MadGraph calculation or arbitrary Rξ Goldstone/Slavnov–Taylor verification; no complete scalar potential/vacuum and collider-constraint validation; no fermionic comparison; a *calculated but not literature-novelty-certified* ideal joint W/Z leptonic azimuthal-interference observable or detector simulation. The **current polarization decomposition is implicitly encoded in the prior published integrated width**, so by itself it is unlikely to constitute a paper.
+No direct complete two-hop INSPIRE citation graph (API unavailable, scholarly connector quota); no independently generated UFO/MadGraph calculation or arbitrary Rξ Goldstone/Slavnov–Taylor verification; no complete scalar potential/vacuum and collider-constraint validation; no fermionic comparison or detector simulation. The ideal joint W/Z angular density **has been computed**, but its independence from existing prior art and experimental usefulness remain unverified. The **current polarization decomposition is implicitly encoded in the prior published integrated width**, so by itself it is unlikely to constitute a paper.
 
 
 ## Additional joint-decay calculation
