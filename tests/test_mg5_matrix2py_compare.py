@@ -15,6 +15,7 @@ sys.path.insert(0,str(ROOT/"src"))
 from mg5_matrix2py_compare import (prepare,external_input_audit,
     build_error_summary,stage_ident_card,evaluate_in_worker)
 from scalar_threshold_amplitudes import ALPHA_W,S2,MW,MZ,splitting
+from mg5_threshold_preflight import format_slha_number
 
 class MG5Matrix2PyPreflight(unittest.TestCase):
     def make_fixture(self,root):
@@ -30,13 +31,13 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
               " 1000001 5.684411E2 # dL\n"
               " 1000002 5.611190E2 # uL\n")
         matched=("BLOCK SMINPUTS\n"
-              f" 1 {1/(ALPHA_W*S2):.15E} # aEWM1\n"
+              f" 1 {format_slha_number(1/(ALPHA_W*S2))} # aEWM1\n"
               " 3 1.180000E-1 # aS\n"
               "BLOCK MASS\n"
-              f" 23 {MZ:.15E} # MZ\n"
-              f" 24 {MW:.15E} # MW\n"
-              f" 1000001 {(mass-delta)/2:.15E} # dL\n"
-              f" 1000002 {(mass+delta)/2:.15E} # uL\n")
+              f" 23 {format_slha_number(MZ)} # MZ\n"
+              f" 24 {format_slha_number(MW)} # MW\n"
+              f" 1000001 {format_slha_number((mass-delta)/2)} # dL\n"
+              f" 1000002 {format_slha_number((mass+delta)/2)} # uL\n")
         for channel in ("Z","gamma"):
             name="MG5_UL_DL_WZ" if channel=="Z" else "MG5_UL_DL_WA"
             p=base/name
@@ -138,12 +139,25 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,"unregistered GF"):
                 prepare("Z",500.,3.,base)
 
+    def test_rejects_legacy_oversized_numeric_fields(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base=self.make_fixture(tmp)
+            path=(base/"MG5_UL_DL_WA"/"Cards"/
+                  "param_card_quirkonium_review_compact.dat")
+            short=format_slha_number(1/(ALPHA_W*S2))
+            # Same numeric value in Python, unsafe for the legacy MG5 reader.
+            legacy=f"{1/(ALPHA_W*S2):.15E}"
+            self.assertGreater(len(legacy),20)
+            path.write_text(path.read_text().replace(short,legacy))
+            with self.assertRaisesRegex(RuntimeError,"Unsafe wide numeric field"):
+                prepare("gamma",500.,3.,base)
+
     def test_rejects_unmatched_electromagnetic_input(self):
         with tempfile.TemporaryDirectory() as tmp:
             base=self.make_fixture(tmp)
             path=base/"MG5_UL_DL_WA/Cards/param_card_quirkonium_review_compact.dat"
             path.write_text(path.read_text().replace(
-                f"{1/(ALPHA_W*S2):.15E}","1.279340E+02"))
+                f"{format_slha_number(1/(ALPHA_W*S2))}","1.279340E+02"))
             with self.assertRaisesRegex(RuntimeError,"Review card mismatches"):
                 prepare("gamma",500.,3.,base)
 
