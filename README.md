@@ -143,3 +143,15 @@ Recommended isolated and reversible fix:
     .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
 
 Only generated standalone P*/makefile files are changed, and backups are preserved. The MG5 installation, original cards and all physics sources remain unchanged. Run the f2py extension with the SAME venv Python used for compilation; a NumPy1.x-built module cannot safely be imported into the active NumPy2.x interpreter. See madgraph/README.md.
+
+
+### Correction to MG5 f2py recovery helper
+
+If the previous helper printed /usr/bin/python3.10 and then raised No f2py3.10 launcher found despite installing NumPy 1.26.4 in .venv-mg5-f2py: these were two bugs in our helper, now addressed. The fix preserves the venv symlink and supports variable-derived f2py3.10 commands via a shim local to the venv.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    .venv-mg5-f2py/bin/python scripts/fix_mg5_f2py_makefile.py --apply
+    .venv-mg5-f2py/bin/f2py3.10 -v
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+
+No global Python packages, MG5 installation or original parameter cards are changed. This is a tooling fix, not yet an independent numerical ME validation.
