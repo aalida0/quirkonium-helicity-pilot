@@ -7,7 +7,7 @@ Execute from the research repository root:
 ```bash
 mkdir -p validation/local_logs
 cd validation/local_logs
-/path/to/MG5_aMC/bin/mg5_aMC ../../madgraph/mssm_ew_procs.mg5 |& tee madgraph_generation.log
+"$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC" ../../madgraph/mssm_ew_procs.mg5 |& tee madgraph_generation.log
 ```
 
 **Validation requirements:** inspect the generated `SubProcesses/*/matrix.f` and Feynman diagrams. Retain the two scalar exchanges, seagull W/V contact vertex, and s-channel W. Set pure-left first-generation squark mixing and the same EW input scheme as `MODEL_SPECIFICATION.md`; suppress first-generation Yukawa/Higgs contamination. For the mass card choose physically consistent masses and ensure correct CKM. Export numerical fixed-color squared matrix elements with a controlled nonzero incoming relative velocity, extrapolate to threshold, and only then compare with `src/scalar_threshold_amplitudes.py`. Standalone compilation is version dependent; don't treat successful generation as a validated matrix-element match.
