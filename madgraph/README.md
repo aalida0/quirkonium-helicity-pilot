@@ -261,3 +261,29 @@ A new diagnostic script scripts/mg5_parameter_isolation.py creates *temporary SL
         --mass 500 --tanbeta 3 --channel both
 
 Raw input/output manifests: validation/local_logs/threshold_benchmarks/M500_tanbeta3_parameter_isolation.json, with subprocess worker logs for each case. No source Fortran, original SLHA card or analytical formula is modified. No benchmark PASS/physical claim can be made until the cause is understood.
+
+
+## 2026-11-07 update: parameter isolation locates EW change; full-review nonreproduction
+
+User ran the generated standalone MG5 factor-isolation diagnostic. Results (all ME2):
+
+| case | WZ | Wgamma |
+|---|---:|---:|
+| original | 0.01292073817016226 | 0.001589724882844365 |
+| squarks_only | 0.0683286862353484 | 0.00172528605269909 |
+| ew_only | 7593.18744541589 | 29.0411384331647 |
+| full_except_ew | 0.06832867993250016 | 0.00172528613695433 |
+| widths_only | 0.0128912020347695 | 0.00158972488379714 |
+| full_review reconstructed from original | 6805310.983732369 | 173.7348371282458 |
+
+This establishes an **electroweak-input dependence**: the huge growth occurs when the group containing SMINPUTS[1] (aEWM1), MASS[24] (MW) and MASS[23] (MZ) changes, while squark masses/widths alone do not. It does NOT yet establish why the EW change causes huge enhancement or whether the model/implementation is wrong.
+
+**Additional consistency failure:** The group-reconstructed full_review does not reproduce the independently evaluated actual preflight review card at the same benchmark and momenta (WZ 142350088.3299091; Wgamma 772.9807959512825). Reconstructed/full ratio differences are ~20.9 and ~4.45. Before assigning physics significance to one factor, verify reconstructed SLHA card fields and parser behavior. It is not scientifically acceptable to classify the group reconstruction as an exact full-review equivalent until it matches numerically. The original MSSM model card reproduces its directly measured ME2 in the factor scan.
+
+New script scripts/mg5_ew_input_audit.py and tests/test_mg5_ew_input_audit.py isolate SMINPUTS[1] and MASS[24] individually and together, compare **exact** preflight review against group reconstruction and all-scalar-key reconstruction, and save the full numeric/diff evidence. Run in the existing virtualenv, without editing any canonical cards:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_ew_input_audit.py --mass 500 --tanbeta 3 --probe
+
+Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_ew_isolation.json. All substituted SLHA cards are diagnostic, not physically consistent MSSM spectra. Stop gate remains NO-GO until exact card and model input consistency is established and independent ME2 comparison agrees.
