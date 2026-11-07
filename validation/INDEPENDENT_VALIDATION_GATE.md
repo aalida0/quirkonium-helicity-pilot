@@ -65,3 +65,8 @@ Refs: https://physics.byu.edu/docs/thesis/1674; https://arxiv.org/abs/1106.3101;
 **MadGraph:** User's MG5_aMC 3.5.1 executable was found and started. Original `import model mssm` failed because this MG5 version requires `MSSM_SLHA2`; all generation commands were skipped. The model card now uses `MSSM_SLHA2`; a postflight checker requires both `SubProcesses/P*/matrix*.f` outputs and fails if error diagnostics appear. **MG5 independent amplitude check: UNKNOWN**, not executed successfully; first retry process generation, then implement a fixed-color numerical matrix-element and threshold comparison.
 
 For source-backed model naming, see ATLAS JobOption/DOxygen examples using `import model MSSM_SLHA2-full` and public MG5 3.x model output. **No claim that the replacement card has already run successfully.**
+
+
+### Updated numerical-MG5 path (2026-11-07)
+
+User has completed process generation (WZ and Wgamma standalones) and preflight with 24 unit tests. Default MSSM_SLHA2 parameter cards contain SMINPUTS[1,3], read AEWM1 and mdl_MW and omit GF. The old READPS-based check_sa evaluator is not compatible with the generated files (READPS=False). Use the documented make matrix2py.so binding via scripts/mg5_matrix2py_compare.py and the read-only review parameter card. Confirm that the UFO's internal SW/CW/GW definitions are consistent with our on-shell EW scheme before final PASS. Report both raw ME values and generated color-denominator lines. Never rewrite original cards or manufacture absent GF, and do not promote process generation to matrix-element validation.
