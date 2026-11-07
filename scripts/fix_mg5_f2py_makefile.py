@@ -91,9 +91,22 @@ def main():
                else "patched Makefile" if updated!=original else "already patched"))
     shim=py.parent/"f2py3.10"
     expected_shim=shim_source(py)
+    existing_compatible=False
     if needs_shim and shim.exists() and shim.read_text()!=expected_shim:
-        raise RuntimeError(f"Refusing to replace existing, different launcher: {shim}")
-    print("Proposed shim:",shim if needs_shim else "not needed")
+        # NumPy 1.26 may *already* install f2py3.10 as a valid venv script.
+        # Do not overwrite or reject it just because it is not our shell shim.
+        if not shim.is_file() or not os.access(shim,os.X_OK):
+            raise RuntimeError(f"Existing venv launcher is not executable: {shim}")
+        probe=subprocess.run([str(shim),"-v"],capture_output=True,
+                             text=True,timeout=20)
+        if probe.returncode or not probe.stdout.strip().startswith(numpy.__version__):
+            raise RuntimeError(
+                f"Existing venv launcher is incompatible, not overwriting {shim}. "
+                f"Exit={probe.returncode} stdout={probe.stdout[-250:]} "
+                f"stderr={probe.stderr[-250:]}")
+        existing_compatible=True
+        print("Verified existing compatible venv f2py3.10:",shim)
+    print("Venv f2py3.10:",shim if needs_shim else "not needed")
     if not args.apply:
         print("DRY RUN: no changes. Add --apply to update local files.")
         return
@@ -106,9 +119,12 @@ def main():
         shim.write_text(expected_shim)
         shim.chmod(0o755)
         print("Created venv-local launcher:",shim)
+    elif needs_shim and existing_compatible:
+        print("Using existing compatible venv-local f2py3.10:",shim)
     elif needs_shim:
+        # Our previously generated shim has already been checked for content.
         shim.chmod(shim.stat().st_mode|0o111)
-        print("Existing matching venv-local launcher:",shim)
+        print("Using existing matching local shim:",shim)
     for path,original,updated in pending:
         backup=path.with_name(BACKUP)
         if not backup.exists():shutil.copy2(path,backup)
