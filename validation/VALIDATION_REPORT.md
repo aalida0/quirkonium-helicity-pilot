@@ -76,3 +76,17 @@ The original `scripts/compare_wolfram.py` failed immediately due to an incorrect
 The user executed the initial standalone MadGraph card using **MG5_aMC 3.5.1** at `$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC`. The executable started, but `import model mssm` returned **ERROR**: model replaced by `MSSM_SLHA2`. MadGraph skipped all subsequent `generate` and `output` commands. This is an **execution/configuration failure**, not evidence against the physical amplitudes. No MG matrix elements have been independently produced.
 
 The model card was updated to `import model MSSM_SLHA2` with the same `ul dl~ > w+ z` and `ul dl~ > w+ a` processes, and a postflight script now explicitly rejects any logged MG error or missing Fortran `matrix.f` output, independent of the MadGraph process exit code. **MG gate remains UNKNOWN pending actual successful generation AND threshold fixed-color ME comparison.** Warnings for FastJet, LHAPDF, Ninja, Collier were nonfatal initialization warnings and unrelated to the model-import failure.
+
+
+### Addendum — MG5 standalone process generation PASS (user run)
+
+The user reran corrected `MSSM_SLHA2` process card with MG5_aMC 3.5.1. Generated:
+- `validation/local_logs/MG5_UL_DL_WZ/SubProcesses/P1_uldlx_wpz/matrix.f`
+- `validation/local_logs/MG5_UL_DL_WA/SubProcesses/P1_uldlx_wpa/matrix.f`
+
+The postflight script `scripts/check_mg5_generation.py` reported:
+`PASS: MG5 process generation produced both standalone matrix directories`.
+
+**Upgrade:** independent **MG5 process generation** PASS (user-supplied log). **Do not upgrade** the independent *matrix-element value* or *physics model consistency* gate: neither `SMATRIX` nor equivalent has yet been evaluated at matched kinematics, and the EW input/mass cards and initial color average were not examined. The generated MSSM color representation is different from IC. Expected at fixed color for a single color-diagonal EW amplitude: the MG5 initial-color-averaged amplitude squared is the fixed-color quirk amplitude squared divided by 3; inspect the generated `IDEN` and color matrix before applying this relation. 
+
+New scripts `scripts/mg5_threshold_preflight.py` and `scripts/mg5_evaluate_threshold.py` prepare exact threshold 4-momenta, matched *copies* of SLHA input cards, explicit expected reference amplitudes, and—**only if supported by the generated check_sa.f**—an exact `PS.input` standalone check. They must be executed on the user machine before any MG5 numerical PASS claim. Model matching must check first-generation squark flavor/mixing matrices, coupling order diagrams, gauge scheme, zero-width convention and color averaging. They do not implement a separate SU(3)_IC UFO.
