@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from inspire_quirkonium_citations import (citations,small_record,references,
-    validate_citation_cross_checks)
+    validate_citation_cross_checks,canonical_recid)
 
 class TestInspireGraph(unittest.TestCase):
     @staticmethod
@@ -42,6 +42,21 @@ class TestInspireGraph(unittest.TestCase):
             x=citations("123",max_pages=2)
         self.assertFalse(x["complete"])
         self.assertTrue(x["errors"])
+
+    def test_arxiv_lookup_alias_uses_numeric_control_number(self):
+        result={"id":"2504.02940","metadata":{
+            "control_number":2912345,
+            "arxiv_eprints":[{"value":"2504.02940"}],
+            "titles":[{"title":"Seed"}]}}
+        self.assertEqual(canonical_recid(result),"2912345")
+        self.assertEqual(small_record(result)["recid"],"2912345")
+
+    def test_external_arxiv_alias_without_control_number_fails_closed(self):
+        with self.assertRaisesRegex(RuntimeError,"no canonical numeric"):
+            canonical_recid({"id":"0805.4667","metadata":{}})
+
+    def test_numeric_hit_id_accepted(self):
+        self.assertEqual(canonical_recid(self.hit(808)), "808")
 
     def test_missing_known_2025_to_2008_citation_is_inconsistent(self):
         data={
