@@ -1,7 +1,7 @@
 # Charged quirkonium polarization — scalar helicity feasibility pilot
 
 **Research date:** 2026-11-07. **Branch:** research/pilot1-literature-model-gate.
-**Status (revised after MG5 2026-11-07): published-width and Mathematica/Python numerical checks PASS scoped, but independent MG5 numerical matrix-element benchmark FAILS by factors 2.677e10 (WZ) and 4.599e5 (Wgamma) at M=500 GeV, tanbeta=3; root cause UNKNOWN. All physics interpretation/plot release PAUSED. No paper or experimental-reach claim.**
+**Status (final 2026-11-07 scoped cross-check): MG5_aMC 3.5.1 independently reproduces both helicity-summed WZ and Wgamma matrix elements at M=500 GeV, tanbeta=3, to ~3e-13 relative. Prior huge mismatches were caused by 21-character SLHA numeric fields; controlled identical-card A/B confirmed an exact 10000x artifact. Physics amplitude gate PASS for this benchmark; independent helicity phases, model viability and publication novelty remain UNKNOWN. No experimental-reach or paper-ready claim.**
 
 ## What has been calculated
 
@@ -233,3 +233,24 @@ Then, only after confirming numerical input handling, retry the matrix element c
     .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
 
 Expected mathematical signature for a clipped original aEWM1 127.934: unsafe 21-character rewrite produces 10000 times the original amplitude squared, while the compact rewrite produces the same value. This signature requires verification with the actual Fortran code; no numeric MG5 PASS or publication claim is yet authorized. Outputs stored at validation/local_logs/threshold_benchmarks/M500_tanbeta3_slha_width_gate.json.
+
+
+### Resolution of the previous MG5 discrepancy (supersedes earlier diagnostic status)
+
+The former 10^5-10^10 failures and NO-GO statements in the chronological
+debugging notes below refer to legacy, misparsed, 21-character SLHA cards
+and **do not describe the current compact-card amplitudes**. A controlled
+same-input, same-kinematics test demonstrated exactly 10000x numerical
+enhancement from long scientific-notation fields. The compact SLHA writer
+and the independent MG5 matrix2py calculations now agree at the
+M=500 GeV, tanbeta=3 benchmark:
+
+- WZ: MG5 5.3175200794627446e-3 vs analytic 5.317520079460985e-3.
+- Wgamma: MG5 1.6806924742524885e-3 vs analytic 1.680692474251963e-3.
+
+Full provenance is frozen in validation/MG5_INDEPENDENT_NUMERIC_2026-11-07.md.
+The first post-change suite had 50 tests with two stale synthetic fixtures
+(failure and error); fixture repairs and an additional regression were pushed
+but have not been rerun locally. This is a narrow theoretical validation,
+NOT proof of novelty, realistic quirks spectrum, helicity-phase fidelity,
+or a publishable result.
