@@ -16,6 +16,7 @@ import math
 import re
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -70,21 +71,66 @@ def prepare(channel,mass,tb,base):
     validate_ps(ps,[b.mu,b.md,MW,b.mv])
     return directory,work,review,b,ps
 
+def build_error_summary(log_text,tail_lines=70):
+    """Return concise actionable build evidence; never infer a single root cause."""
+    lines=log_text.splitlines()
+    patterns=(
+        r"\berror\b",r"\bfatal\b",r"\bnot found\b",
+        r"no rule to make target",r"\btraceback\b",
+        r"ModuleNotFoundError",r"undefined reference",
+        r"cannot find",r"no such file",r"command not found",
+        r"subprocess-exited-with-error",
+    )
+    rx=re.compile("|".join(patterns),re.I)
+    hits=[line for line in lines if rx.search(line)]
+    return {"error_lines":hits[-15:], "tail":lines[-tail_lines:],
+            "line_count":len(lines)}
+
+def compiler_environment():
+    """Non-invasive snapshot to help distinguish missing tools from tool mismatches."""
+    info={"python":sys.executable,"python_version":sys.version.split()[0]}
+    for command in ("make","gfortran","gcc","f2py"):
+        info[command]=shutil.which(command)
+    try:
+        import numpy
+        info["numpy"]=numpy.__version__
+        info["numpy_path"]=numpy.__file__
+    except Exception as exc:
+        info["numpy_error"]=f"{type(exc).__name__}: {exc}"
+    return info
+
 def compile_extension(work,logdir):
     candidates=list(work.glob("matrix2py*.so"))
     if candidates:return candidates
     command=["make","matrix2py.so"]
+    environment=compiler_environment()
     print("Building standalone Python ME extension:",work,flush=True)
+    print("Build environment:",json.dumps(environment,sort_keys=True),flush=True)
+    (logdir/"matrix2py_environment.json").write_text(
+        json.dumps(environment,indent=2))
     try:
         proc=subprocess.run(command,cwd=work,capture_output=True,text=True,timeout=240)
     except (OSError,subprocess.TimeoutExpired) as ex:
         raise RuntimeError(f"Cannot compile matrix2py: {ex}") from ex
-    (logdir/"matrix2py_build.log").write_text(
-        "$ "+" ".join(command)+"\n"+proc.stdout+"\n"+proc.stderr)
+    output="$ "+" ".join(command)+"\n"+proc.stdout+"\n"+proc.stderr
+    logfile=logdir/"matrix2py_build.log"
+    logfile.write_text(output)
     if proc.returncode:
-        raise RuntimeError("MadGraph standalone make matrix2py.so failed. "
-                           f"Inspect {logdir/'matrix2py_build.log'}; "
-                           "requires a compatible Python, NumPy/f2py and gfortran.")
+        summary=build_error_summary(output)
+        print("\n====== MadGraph matrix2py build diagnostics ======",file=sys.stderr)
+        print("Make exit code:",proc.returncode,file=sys.stderr)
+        print("Build log:",logfile,file=sys.stderr)
+        print("Relevant error lines:",file=sys.stderr)
+        for line in summary["error_lines"]:
+            print(line[:500],file=sys.stderr)
+        print("Last build-log lines:",file=sys.stderr)
+        for line in summary["tail"]:
+            print(line[:500],file=sys.stderr)
+        print("======= End of matrix2py build diagnostics =======\n",file=sys.stderr)
+        raise RuntimeError("MadGraph matrix2py compilation FAILED. "
+                           f"Attach the exact build log at {logfile}. "
+                           "Do not modify model inputs or downgrade packages "
+                           "until the compiler's actual error is identified.")
     candidates=list(work.glob("matrix2py*.so"))
     if not candidates:
         raise RuntimeError("make returned 0 but no matrix2py shared library appeared")
