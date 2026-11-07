@@ -85,3 +85,37 @@ PY
 ```
 
 Also inspect the *original* `MG5_UL_DL_WZ/Cards/param_card.dat` `BLOCK SMINPUTS` and generated `Source/MODEL` electroweak parameter handling. Do **not** inject an unregistered external GF value just to satisfy an old preflight assumption, and do **not** run `--apply` or `mg5_evaluate_threshold.py` before EW matching is understood.
+
+
+## Preferred method after 2026-11-07 preflight: matrix2py, NOT check_sa / READPS
+
+The user has now run the preflight on the generated MG5_aMC 3.5.1 standalones:
+- 24 Python tests passed.
+- Source/MODEL/param_read.inc directly loads **aEWM1** and **mdl_MW**.
+- Original external card has SMINPUTS keys **[1,3]**, and original MASS[24]=79.82901 GeV, differing from the target MW=80.379 GeV.
+- The standalone check_sa.f did **not** expose the READPS interface. Thus the older mg5_evaluate_threshold.py path is **not usable on this generated version**.
+- Read-only preflight and --write-cards review copies passed. The original cards were not overwritten.
+
+The exact external scheme still needs checking against generated model's internal coupling relations, but **GF is not required simply because generic SLHA2 convention calls it SMINPUTS[2]**. Do not invent GF. Our preview cards match external alpha_EM = alpha_W sin²(thetaW) and independent MW,MZ and the two squark masses; the model must derive the corresponding weak-angle and weak gauge coupling for a physical apples-to-apples comparison.
+
+MadGraph's official standalone documentation gives a direct method: compile a Python-wrapped Fortran extension with make matrix2py.so, load a parameter card using matrix2py.initialisemodel, and evaluate matrix2py.get_value(P, alpha_s, -1). See https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/FAQ-General-4. This uses our **review** card and does not modify the generated default.
+
+From the repository root:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3 --write-cards
+    python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+NumPy, NumPy f2py compatible with the active Python, GNU Fortran and a C compiler are needed to compile the shared library. Each channel is evaluated in a separate Python process to avoid colliding shared-library module names. The result is stored at:
+    validation/local_logs/threshold_benchmarks/M500_tanbeta3_Z/matrix2py_result.json
+    validation/local_logs/threshold_benchmarks/M500_tanbeta3_gamma/matrix2py_result.json
+
+The first two analytical **targets if MG5 averages over three initial squark colors** are:
+- WZ: 0.005317520079460985
+- Wgamma: 0.0016806924742519627
+
+These are not MG5 results. If ratios differ, investigate color averaging, squark mixings, EW external input dependencies, exact generated diagrams, and width/gauge conventions. Do not tune couplings to force agreement. Even ratio 1 in both channels is a scoped matrix element cross-check, not a physical allowed bound-state benchmark.
+
+Important: the older documented --apply / mg5_evaluate_threshold.py path should **not** be used for these outputs, because it requires READPS and edits original param cards. Keep the generated defaults intact.
