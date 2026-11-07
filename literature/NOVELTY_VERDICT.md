@@ -1,11 +1,11 @@
-# Initial adversarial novelty verdict
+# Adversarial novelty verdict — 2026-11-07
 
-**Overall: CONDITIONAL / NOT YET A GO.** This is an incomplete audit and calculation.
+**Status: Novelty UNKNOWN; current results alone insufficient for a paper.**
 
-- **Already published:** integrated charged quirkonium Wγ/WZ rates for fermion and scalar cases; scalar mass-splitting-dependent branching fractions.
-- **Universal selection rule, not novelty:** spin-zero charged parent → on-shell Wγ has only transverse W; its rest-frame two-body emission is isotropic. Measuring/replotting this property alone is not a new physics result.
-- **Potentially new but NOT established:** joint W/Z spin-density matrices, interference observables, and lepton decay angle moments *for a fully defined scalar versus fermion comparison*, with mass splitting and production polarization consistently treated.
-- **Unknown:** whether source literature already gives equivalent helicity fractions or an easily transferable full amplitude; whether feasible model comparisons survive constraints and normalization uncertainties.
-- **NO-GO trigger:** any identical computed distributions or universal-only result. No novelty claim can be published until forward/backward citation audit and full-text overlap checks finish.
+1. **Published:** charged scalar Wgamma/WZ integrated rates and analytic amplitudes (Burdman et al. 2008; Joshua D. Forsyth 2023 thesis; Forsyth et al. 2025); erratum restricts mass splitting. Our reproduced widths are validation, not novel discovery.
+2. **Adjacent:** Fok/Kribs fermionic quirkonium, Kahawala/Kats general spin-angular formalism, Li et al. electroweak hidden-force bound states.
+3. **Pilot-derived but not proven novel:** explicit physical 0+ WZ longitudinal/transverse projection, f00 versus erratum-constrained tan beta, ideal W-lepton angular marginal. These are implicit in published squared width and SM helicity theory, so likely insufficient alone.
+4. **Not yet calculated:** genuinely joint W+Z decay-angular interference observables, robust second physically consistent model, collider formation uncertainties.
+5. **Unverified:** canonical INSPIRE multihop cited/citing network and exhaustive graduate theses/software search.
 
-This deliberately rejects a manuscript-scale project before the key amplitude and prior-art gates pass.
+**Decision:** NO-GO for claiming manuscript readiness; conditional GO only for a narrow joint-decay-angle pilot after citation-network overlap check, if nontrivial measurable model separation exists. Otherwise terminate this idea rather than launch a wide scan.
