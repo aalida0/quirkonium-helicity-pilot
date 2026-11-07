@@ -51,12 +51,12 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
         return base
 
     def test_build_error_summary_keeps_compiler_diagnostic(self):
-        log=("gfortran -c matrix.f\\n"
-             "fatal error: Python.h: No such file or directory\\n"
-             "make: *** [makefile:90: matrix2py.so] Error 1\\n")
+        log=("gfortran -c matrix.f\n"
+             "fatal error: Python.h: No such file or directory\n"
+             "make: *** [makefile:90: matrix2py.so] Error 1\n")
         report=build_error_summary(log,tail_lines=2)
         self.assertTrue(report["error_lines"])
-        self.assertIn("Python.h", "\\n".join(report["error_lines"]))
+        self.assertIn("Python.h", "\n".join(report["error_lines"]))
         self.assertIn("Error 1", report["tail"][-1])
 
     def test_accepts_missing_gf_with_review_card(self):
