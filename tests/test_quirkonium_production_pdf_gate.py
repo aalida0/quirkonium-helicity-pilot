@@ -61,10 +61,7 @@ class SourceProductionTests(unittest.TestCase):
         ratio=row["low_over_high_production"]
         self.assertLess(abs(ratio-1),.005)
         self.assertEqual(row["source_partonic_sign_parity_residual"],0.)
-        self.assertEqual(row["low"]["ceiling"]["actual_reconstructed_efficiency"]
-                             if "actual_reconstructed_efficiency" in
-                                row["low"]["ceiling"] else
-                         row["low"]["ceiling"]["fiducial_efficiency"],
+        self.assertEqual(row["low"]["ceiling"]["fiducial_efficiency"],
                          "UNKNOWN")
 
     def test_ceiling_is_necessary_only(self):
