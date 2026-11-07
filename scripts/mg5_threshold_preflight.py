@@ -79,6 +79,25 @@ def replace_card(text,updates):
         out.append(line)
     return "".join(out),found
 
+def ew_input_audit(prior,found,GF_target):
+    """Report model-card EW inputs without guessing absent parameters.
+
+    A missing SMINPUTS[2] is not necessarily a malformed file: the generated
+    UFO may use a different external-input basis. Do not silently add GF.
+    """
+    codes=sorted(k[1] for k in prior if k[0]=="SMINPUTS")
+    return {
+        "SMINPUTS_codes_present":codes,
+        "SMINPUTS_2_Gf_present":("SMINPUTS",2) in prior,
+        "SMINPUTS_2_Gf_original":prior.get(("SMINPUTS",2)),
+        "SMINPUTS_2_Gf_target":GF_target,
+        "SMINPUTS_2_Gf_was_updated":("SMINPUTS",2) in found,
+        "input_scheme_status":(
+          "GF_ENTRY_PRESENT_EW_SCHEME_STILL_REQUIRES_MODEL_CHECK"
+          if ("SMINPUTS",2) in prior else
+          "UNKNOWN_GF_ENTRY_ABSENT_MODEL_SCHEME_MUST_BE_VERIFIED")
+    }
+
 def reference(b):
     ts,long=helicities(b)
     m2=sum(x*x for x in ts)+(0 if long is None else long*long)
@@ -130,10 +149,24 @@ def run():
                  ("DECAY",1000001):0.,("DECAY",1000002):0.,
                  ("MINPAR",3):args.tanbeta,("HMIX",2):args.tanbeta}
         matched,found=replace_card(card.read_text(),updates)
+        # SMINPUTS[2] conventionally encodes GF, but it is not necessarily an
+        # external parameter in every generated UFO. Inspect the model's
+        # parameters.py / Source/MODEL before deciding how to set it.
         required={("MASS",1000002),("MASS",1000001),("MASS",23),
-                  ("SMINPUTS",1),("SMINPUTS",2)}
+                  ("SMINPUTS",1)}
         if not required.issubset(found):
-            raise RuntimeError(f"{card} lacks required entries {required-found}")
+            raise RuntimeError(f"{card} lacks baseline editable entries {required-found}")
+        ew_audit=ew_input_audit(prior,found,gf)
+        if not ew_audit["SMINPUTS_2_Gf_present"]:
+            print(f"WARNING {V}: SMINPUTS[2] (G_F) absent from {card}")
+            print("  Keeping the original model card's external-input scheme.")
+            print("  Card preview is permitted; activation is BLOCKED until "
+                  "the generated UFO's EW parameter dependencies are verified.")
+            if args.apply:
+                raise RuntimeError(
+                    f"{card}: refusing --apply with unknown GF/EW input scheme. "
+                    "Inspect the original SMINPUTS block and the model "
+                    "Source/MODEL or UFO parameters.py; do not inject GF blindly.")
         stem=f"M{args.mass:g}_tanbeta{args.tanbeta:g}_{V}"
         target=folder/stem
         target.mkdir(exist_ok=True)
@@ -150,6 +183,7 @@ def run():
                                  for i in (1000001,1000002,23,24)},
                  "default_SMINPUTS":{str(i):prior.get(("SMINPUTS",i))
                                      for i in (1,2)},
+                 "electroweak_input_audit":ew_audit,
                  "default_widths":{str(i):prior_width.get(i)
                                     for i in (23,24,1000001,1000002)},
                  "matched_up_squark_mass_GeV":b.mu,
@@ -157,7 +191,9 @@ def run():
                  "missing_optional_card_entries":[str(x) for x in updates if x not in found],
                  "PS_input":str(psfile),**reference(b)}
         if args.write_cards:
-            dest=card.with_name("param_card_quirkonium_matched.dat")
+            # This is a review copy, not necessarily a physically matched
+            # input card (in particular when SMINPUTS[2] is absent).
+            dest=card.with_name("param_card_quirkonium_review.dat")
             dest.write_text(matched)
             payload["matched_card"]=str(dest)
             if args.apply:
@@ -180,5 +216,6 @@ def run():
     if not args.write_cards:
         print("Model cards unmodified (read-only). Add --write-cards to create copies.")
     elif not args.apply:
-        print("Matched cards created but NOT activated. Use --apply to back up and activate.")
+        print("SLHA review copies created, NOT activated.")
+        print("Verify UFO EW input scheme before --apply or actual ME evaluation.")
 if __name__=="__main__":run()
