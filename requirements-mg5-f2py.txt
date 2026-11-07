@@ -1,0 +1,7 @@
+# MG5_aMC 3.5.1 standalone matrix2py compatibility environment, Python 3.10
+# Legacy MG5 generated makefile uses --f77exec, which is supported by the
+# NumPy 1.26 f2py distutils backend on Python 3.10.
+# Do NOT replace NumPy in a system, Athena, or MadGraph-wide environment.
+numpy==1.26.4
+setuptools==68.2.2
+wheel==0.45.1
