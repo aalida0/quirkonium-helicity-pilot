@@ -254,3 +254,47 @@ The first post-change suite had 50 tests with two stale synthetic fixtures
 but have not been rerun locally. This is a narrow theoretical validation,
 NOT proof of novelty, realistic quirks spectrum, helicity-phase fidelity,
 or a publishable result.
+
+
+## 2026-11-07 continuation: explicit two-branch interference mechanism
+
+The physics pilot has identified a narrowly scoped potential result:
+the published tree-level scalar quirkonium WZ and Wgamma rates imply
+Gamma(WZ)/Gamma(Wgamma) =
+[tan^2(thetaW) beta_WZ / beta_Wgamma]/(1-f00).
+At fixed M, the WZ/Wgamma normalized rates and f00 thus carry the
+same information; the longitudinal/transverse relative phase does not
+appear in either. The ideal lepton decay-plane signed interference
+a1 proportional to Re(H++ H00*) can distinguish amplitude branches
+sharing the same f00.
+
+For M=500 GeV, tanbeta=3 and tanbeta_low approximately 0.394724021524:
+f00=0.9092814481, BR(WZ) under the two-channel assumption=0.7530816453,
+while a1 approximately -0.1203051105 and +0.1203051105 respectively.
+The discrete sign ambiguity is a **mathematical LO model feature**,
+not yet demonstrated physically realizable in the original SUSY
+construction. The 2025 paper discusses tanbeta>1 in its SUSY context;
+the 2026 erratum plots a wider interval 0.1--10. Both facts must be
+reconciled before claiming a viable low-tanbeta branch.
+
+This is more specific than generic cosPhi/cos2Phi angles, which are
+known from diboson resonance angular analyses; novelty still UNKNOWN.
+The external MG5 helicity-summed matrix-element benchmark is scoped
+PASS at M=500, tanbeta=3, but independent complex amplitude phases and
+multi-benchmark pass are PENDING. Nor has the user yet run new ideal
+moment-statistics or branch-degeneracy tests.
+
+New self-contained sources:
+- theory/branch_degeneracy.md (derivation, signs, caveats);
+- scripts/quirkonium_branch_degeneracy.py (seven-mass bisection scan);
+- scripts/ideal_a1_statistical_gate.py (perfect-reconstruction
+  statistics, not event yield or sensitivity);
+- scripts/mg5_benchmark_grid.py (six-M/tanbeta independent ME grid);
+- scripts/mg5_fixed_helicity_audit.py (MG5 LL/TT squared components,
+  NOT complex phase);
+- scripts/inspire_quirkonium_citations.py (networked INSPIRE
+  reference/citing metadata with explicit incomplete-status fallback).
+
+Decision: Conditional GO for mathematical/validation pilot only.
+NO-GO for a manuscript, physical tanbeta-branch claim, experimental
+sensitivity, or novelty assertion until the remaining gates are closed.
