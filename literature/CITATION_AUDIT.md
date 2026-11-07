@@ -98,3 +98,59 @@ integrity/novelty UNKNOWN; paper readiness NOT ESTABLISHED.
     python scripts/inspire_quirkonium_citations.py --depth 1
 
 No changes to the original matrices, model sources or original cards.
+
+
+## 2026-11-07: 69 tests PASS; 6-leg angular-generation PASS; full phase pending
+
+User reported 69/69 Python tests PASS in 3.603 s. The INSPIRE
+first-hop crawler retrieved metadata citation counts 67 (2008),
+36 (2011 fermionic), and 9 (2025 scalar), yet flawed searches returned
+0, 4, and 2 forward papers, respectively. The crawler correctly
+flagged COUNT_DISAGREEMENT plus a missing documented 2025 -> 2008
+bibliographic edge and returned complete_requested_scope=False.
+
+**Likely root cause diagnosed from our code and INSPIRE documentation:**
+/api/arxiv/{identifier} returns an external arXiv lookup id, which
+the previous crawler mistakenly used as the internal literature recid.
+Its warning's expected_citing_recid was literally 2504.02940, i.e.,
+an arXiv ID rather than a numeric INSPIRE record. INSPIRE documents
+refersto:recid:<NUMERIC_LITERATURE_ID>. The crawler now exclusively
+selects metadata.control_number (or verifies another numeric recid),
+refuses nonnumeric identifiers, and records both lookup and canonical
+IDs. An integrity rerun is required; no claim of corrected coverage
+until it returns coherent forward lists. Unit regression tests added.
+
+User independently executed MG5_aMC v3.5.1 tree-level resonant decay
+chain generation for ul dl~ > W+Z, W+ > e+ ve, Z > mu+ mu-.
+The generated six-leg standalone is
+validation/local_logs/MG5_UL_DL_WZ_3LNU with subprocess folder
+P1_uldlx_wpz_wp_epve_z_mupmum; four production diagrams plus two
+leptonic one-diagram decays. The warnings about unavailable
+FastJet, LHAPDF, eMELA and loop tools did not block generation.
+This is a generation PASS, not an external complex-phase or a1 PASS.
+
+A NEW numerical runner scripts/mg5_spin_correlated_angles.py plus
+scripts/mg5_6leg_worker.py now prepares separate compact mass-matched
+SLHA cards with W and Z internal widths nonzero (2.085/2.4952 GeV),
+compiles the 6-leg standalone with the existing NumPy-1.26.4 venv,
+constructs explicit conserved on-shell six-particle four-vectors,
+and compares the fully spin-correlated 2->4 MG5 Phi distribution to the
+signed analytic angular density for the two equal-f00, opposite-a1
+branches. It requires a verified generated leg order and zero outgoing
+lepton masses, and refuses arbitrary matching factors. The numerical
+6-leg step is committed but **NOT YET USER-EXECUTED**.
+
+Run:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/inspire_quirkonium_citations.py --depth 1
+    .venv-mg5-f2py/bin/python scripts/mg5_spin_correlated_angles.py --mass 500 --tanbeta-high 3 --nodes 10 --phis 8
+
+Independent MG5 12-point summed amplitudes and LL/TT squared
+polarizations remain PASS. Signed cosPhi interference is still
+UNKNOWN external until new 6-leg amplitudes actually run.
+
+The model applicability of tanbeta<1, publication novelty and
+collider sensitivity all remain UNKNOWN. Successful full 6-leg
+differential-shape agreement will *not* settle those issues.
