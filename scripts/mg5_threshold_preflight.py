@@ -98,6 +98,27 @@ def ew_input_audit(prior,found,GF_target):
           "UNKNOWN_GF_ENTRY_ABSENT_MODEL_SCHEME_MUST_BE_VERIFIED")
     }
 
+def model_ew_source_hints(out):
+    """Collect short clues only; no inference that a parameter is external."""
+    candidates=[
+        out/"Source/MODEL/param_read.inc",
+        out/"Source/MODEL/input.inc",
+        out/"Source/MODEL/couplings.f",
+        out/"Source/MODEL/param_card.inc",
+        out/"bin/internal/ufomodel/parameters.py",
+        out/"Source/MODEL/parameters.py",
+    ]
+    hints=[]
+    rx=re.compile(r"\b(GF|Gf|aEWM1|SMINPUTS|sin2|sw2|MDL_MW)\b",re.I)
+    for candidate in candidates:
+        if not candidate.is_file():continue
+        for no,line in enumerate(candidate.read_text(errors="replace").splitlines(),1):
+            if rx.search(line):
+                hints.append({"file":str(candidate),"line":no,
+                              "snippet":line.strip()[:160]})
+                if len(hints)>=40:return hints
+    return hints
+
 def reference(b):
     ts,long=helicities(b)
     m2=sum(x*x for x in ts)+(0 if long is None else long*long)
@@ -160,6 +181,8 @@ def run():
         if not ew_audit["SMINPUTS_2_Gf_present"]:
             print(f"WARNING {V}: SMINPUTS[2] (G_F) absent from {card}")
             print("  Keeping the original model card's external-input scheme.")
+            print("  Existing SMINPUTS codes:",ew_audit["SMINPUTS_codes_present"])
+            print("  Check generated UFO/Source/MODEL for electroweak inputs.")
             print("  Card preview is permitted; activation is BLOCKED until "
                   "the generated UFO's EW parameter dependencies are verified.")
             if args.apply:
@@ -184,6 +207,7 @@ def run():
                  "default_SMINPUTS":{str(i):prior.get(("SMINPUTS",i))
                                      for i in (1,2)},
                  "electroweak_input_audit":ew_audit,
+                 "model_EW_source_hints":model_ew_source_hints(out),
                  "default_widths":{str(i):prior_width.get(i)
                                     for i in (23,24,1000001,1000002)},
                  "matched_up_squark_mass_GeV":b.mu,
@@ -209,6 +233,7 @@ def run():
               f"MG5 target *if* color denominator=3: "
               f"{payload['candidate_MG5_color_averaged_if_denominator_3']:.12g}")
         print(f"  PS.input: {psfile}; READPS supported? {payload['check_sa_has_READPS']}")
+        print(f"  Source/MODEL EW hints recorded: {len(payload['model_EW_source_hints'])}")
     output=folder/f"M{args.mass:g}_tanbeta{args.tanbeta:g}_preflight.json"
     output.write_text(json.dumps(report,indent=2))
     print("Saved manifest:",output)
