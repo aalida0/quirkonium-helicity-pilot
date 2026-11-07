@@ -483,3 +483,63 @@ valuable gate is source-matched sigma(pp→Psi±) and a bounded
 model/perturbativity check for tanbeta≈0.395. Do not extend
 amplitude infrastructure further. Full numerical results:
 validation/FEASIBILITY_USER_RESULTS_2026-11-08.md.
+
+
+### 2026-11-08: fixed-kinematics 12x24 refinement and LO production ceiling
+
+User-run ideal neutrino-pz reconstruction (M500, fixed 5 orientations
+and rapidities [-1,0,1], 12 Legendre nodes, 24 Phi points):
+truth a1 low/high +.1203701/-.1203701;
+smaller-|pz| low/high +.0394985/-.0386140;
+Delta a1=+.078112, 3sigma simple-moment
+N(selected clean 3lnu)=2979. Under BR(WZ)=.753082,
+W->e/mu nu=.216, Z->ee/mumu=.0673, and L=3000/fb, this needs
+at least sigma_charged_pair=90.71 fb at Pcharged_survival=1 and
+reconstruction efficiency=1 (or 907.1 fb if efficiency=.1),
+all BEFORE SM WZ backgrounds. It is not yet numerically
+converged: earlier same-ensemble 5x12 and 8x16 gave
+Delta a1=.098015 and .090099, respectively. Sign persists
+in all sampled resolutions, but statistical requirement drifts.
+
+A source-matched LO PDF production-ceiling gate is now available:
+scripts/quirkonium_production_pdf_gate.py with offline regressions
+tests/test_quirkonium_production_pdf_gate.py. Implements the published
+Forsyth et al (2025) Appendix A.2 s-channel W* scalar-pair
+cross section and both proton beam assignments, W+/W- charges;
+mode 'ud' reproduces displayed source flavor channel,
+mode 'full-ckm' adds an explicitly labelled LO CKM flavor extension.
+Records PDF set/member, scales, two integration orders and a
+necessary-only comparison to the 90.71 fb toy threshold.
+No QCD squark production, or extra hidden-color factor silently
+inserted. Physical bound-state cooling/beta-decay survival is
+UNKNOWN. Python LHAPDF and a locally installed PDF set are
+required; they are missing from the assistant environment,
+so no production-rate number has been calculated.
+
+    cd ~/quirkonium-helicity-pilot
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    command -v lhapdf-config || true
+    python -c "import lhapdf; print('LHAPDF import OK')" || true
+
+If the Python module and PDF set exist:
+
+    python scripts/quirkonium_production_pdf_gate.py \
+       --pdf-set MSTW2008lo68cl \
+       --energies 13.6 14 --masses 500 \
+       --nodes 48 72 --flavor-mode ud --required-fb 90.71
+
+    python scripts/quirkonium_production_pdf_gate.py \
+       --pdf-set MSTW2008lo68cl \
+       --energies 13.6 14 --masses 500 \
+       --nodes 48 72 --flavor-mode full-ckm --required-fb 90.71 \
+       --output validation/local_logs/charged_prod_fullckm_LO.json
+
+Missing LHAPDF bindings/PDF must report BLOCKED_PDF_DEPENDENCY
+or BLOCKED_PDF_SET, not be misreported as zero cross section.
+Do not interpret a charged-pair rate above the toy threshold
+as proof of a measurable angular effect, since deexcitation
+survival and SM WZ backgrounds are missing.
+
+Source details, output interpretation and stop criteria:
+validation/CHARGED_PRODUCTION_GATE_2026-11-08.md.
