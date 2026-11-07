@@ -119,3 +119,25 @@ The first two analytical **targets if MG5 averages over three initial squark col
 These are not MG5 results. If ratios differ, investigate color averaging, squark mixings, EW external input dependencies, exact generated diagrams, and width/gauge conventions. Do not tune couplings to force agreement. Even ratio 1 in both channels is a scoped matrix element cross-check, not a physical allowed bound-state benchmark.
 
 Important: the older documented --apply / mg5_evaluate_threshold.py path should **not** be used for these outputs, because it requires READPS and edits original param cards. Keep the generated defaults intact.
+
+
+## 2026-11-07 matrix2py build failed — compiler diagnosis required
+
+User completed 27 unit tests and preflight for both channels. The first WZ make matrix2py.so returned a nonzero exit code and stopped **before any numerical matrix-element calculation**. The wrapper originally stored the complete build stderr/stdout in:
+
+    validation/local_logs/threshold_benchmarks/M500_tanbeta3_Z/matrix2py_build.log
+
+But only printed a generic traceback. The wrapper now prints the relevant error lines and last 70 lines of the build log and records Python/NumPy/f2py/make/gcc/gfortran executables in matrix2py_environment.json. **No root cause is yet known from the user-provided traceback alone.**
+
+Recover the exact compiler error without rerunning:
+
+    LOG=validation/local_logs/threshold_benchmarks/M500_tanbeta3_Z/matrix2py_build.log
+    grep -nEi 'error|fatal|not found|no rule|python.h|distutils|f2py|traceback|undefined reference|cannot find' "$LOG" | tail -n 35
+    tail -n 70 "$LOG"
+    python --version
+    python -m numpy.f2py -v
+    command -v gfortran; command -v f2py; command -v make
+
+MadGraph's official standalone Python API documents make matrix2py.so in the process-specific SubProcesses/P* directory, followed by matrix2py.initialisemodel(path) and matrix2py.get_value(p,alphas,-1). See https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/FAQ-General-4. The build needs compatible NumPy/f2py, Python headers and Fortran tools. Do not guess which dependency is broken, install random packages, or change the physics card until the log is inspected.
+
+The numerical MG5 gate is still **UNKNOWN**; 27 passing tests do not substitute for the independent generator ME.
