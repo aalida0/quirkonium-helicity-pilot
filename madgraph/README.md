@@ -141,3 +141,33 @@ Recover the exact compiler error without rerunning:
 MadGraph's official standalone Python API documents make matrix2py.so in the process-specific SubProcesses/P* directory, followed by matrix2py.initialisemodel(path) and matrix2py.get_value(p,alphas,-1). See https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/FAQ-General-4. The build needs compatible NumPy/f2py, Python headers and Fortran tools. Do not guess which dependency is broken, install random packages, or change the physics card until the log is inspected.
 
 The numerical MG5 gate is still **UNKNOWN**; 27 passing tests do not substitute for the independent generator ME.
+
+
+## 2026-11-07: f2py3.10 / NumPy version mismatch — ROOT CAUSE FOUND
+
+User's exact `matrix2py_build.log` showed:
+
+    f2py3.10 -L../../lib/ -ldhelas -lmodel -c matrix.f -m matrix2py --f77exec=gfortran
+    File "/usr/bin/f2py3.10", line 33
+      sys.exit(load_entry_point('numpy==1.21.5', 'console_scripts', 'f2py3.10')())
+    StopIteration
+    make: *** [makefile:27: matrix2py.so] Error 1
+
+System Python is 3.10.12, with active `python -m numpy.f2py -v` = 2.2.6, `f2py` at ~/.local/bin/f2py. gfortran and gcc exist. The legacy f2py3.10 entry-point launcher is stale; no Fortran compiler error has occurred yet.
+
+The generated Makefile uses a legacy f2py invocation with `--f77exec=gfortran`. For a reproducible Python 3.10 build, prefer an ISOLATED venv with NumPy 1.26.4 and setuptools 68.2.2, preserving the older distutils build interface. Do NOT overwrite the system numpy, Athena, or global MadGraph installation. NumPy 2.x can use a Meson backend but that may require changing the legacy f2py flags; do not combine separate solutions without testing.
+
+From repository root:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python3.10 -m venv .venv-mg5-f2py
+    .venv-mg5-f2py/bin/python -m pip install -r requirements-mg5-f2py.txt
+    .venv-mg5-f2py/bin/python -m numpy.f2py -v
+    .venv-mg5-f2py/bin/python scripts/fix_mg5_f2py_makefile.py
+    .venv-mg5-f2py/bin/python scripts/fix_mg5_f2py_makefile.py --apply
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+The patch changes ONLY generated standalone `SubProcesses/P*/makefile` files; each original saved as `makefile.before_quirkonium_f2py`. It substitutes the broken `f2py3.10` invocation with the venv interpreter's `python -m numpy.f2py`. It does not edit `matrix.f`, model UFO files, EW input cards, or system symlinks. Use the **same interpreter** for compiling and importing a NumPy extension to avoid 1.x/2.x ABI mismatch.
+
+The next build may expose an actual compiler problem. The wrapper prints full diagnostic errors and writes `matrix2py_environment.json`. Do not claim independent ME validation until it produces **numeric results** and the color/mixing/coupling conventions are audited.
