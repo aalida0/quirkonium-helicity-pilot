@@ -1,6 +1,6 @@
 # Pilot decision — 2026-11-07
 
-**Current decision (revised after MG5 2026-11-07): NO-GO for quantitative physics conclusions or manuscript development until the independent matrix-element discrepancy is resolved. Diagnostic validation work only.**
+**Current decision (2026-11-07 update after fixing legacy SLHA formatting): CONDITIONAL GO for a small, tightly scoped physics/novelty pilot; NO-GO for claiming a new publishable paper yet. The independent MG5 helicity-summed WZ and Wgamma matrix elements agree with the analytic expressions to ~3e-13 relative at M=500 GeV, tanbeta=3.**
 
 ## Established result
 
@@ -95,3 +95,27 @@ Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_slha_width_gate
 All original model, Fortran source and SLHA cards preserved.
 
 NO-GO status remains until a genuinely corrected MG5 ME matches the analytic color-averaged target and electroweak model dependence is checked. Novelty/literature risk remains independent.
+
+
+## Final update: the independent MG5 amplitude stop gate is CLOSED (scoped)
+
+Correctly serialized compact SLHA cards remove the apparent 10^5-10^10
+MadGraph/Python disagreement. Controlled identical-physics SLHA formatting
+A/B tests demonstrate exactly a factor 10000 artificial increase with
+legacy 21-character fields. Both WZ and Wgamma independently generated MG5
+helicity-summed tree-level ME2 match the analytic targets at M=500 GeV,
+tanbeta=3 to about 3e-13 relative.
+
+Source: validation/MG5_INDEPENDENT_NUMERIC_2026-11-07.md. Chronological
+earlier "NO-GO until the mismatch is resolved" notes are superseded as
+amplitude validation statements. They should NOT be interpreted as
+physical discrepancies. This is one benchmark and does not independently
+establish complex helicity relative phases or general-gauge invariance.
+
+Publication verdict REMAINS NO-GO for now due to novelty: part of the
+helicity fraction result is implicit in published Forsyth et al. squared
+amplitudes. Priority: (1) reproduce independent MG5 checks on a modest
+mass/splitting grid; (2) verify complex helicity phase/interference directly;
+(3) complete forward/backward citation-network audit and identify a clearly
+distinct scalar-vs-fermion or related observable. Do not begin a broad scan
+until those gates support a new claim.
