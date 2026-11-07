@@ -193,3 +193,33 @@ Run from repo root with the existing venv (no reinstall required):
     .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
 
 Expected selected Python path is inside .venv-mg5-f2py/bin and both NumPy/f2py versions should be 1.26.4. This fix is NOT yet executed on the user's machine. If compilation exposes a new error, use the printed compiler diagnostic and saved matrix2py_build.log; do not assume the physics result.
+
+
+## 2026-11-07: matrix2py builds both channels; Fortran initialization exits at ident_card.dat
+
+User executed both channels with isolated Python 3.10/NumPy 1.26.4. Both matrix2py shared libraries built, then initialisemodel printed:
+
+    Warning: file ident_card.dat not found in the parent directories!(lha_read)
+
+The Python command returned to the shell **without a get_value result**. This is a model-metadata/CWD initialization problem, NOT a numerical WZ/Wgamma discrepancy. The MG5 standalone matrix2py usage example calls initialisemodel from the generated SubProcesses/P* directory, which is not where the old wrapper executed. Source: https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/FAQ-General-4
+
+The wrapper now:
+1. Searches for an **existing original generated** ident_card.dat in the standalone output (Source/MODEL, Cards, Source, other model directories) and in the P* parent search path.
+2. If needed, creates a symbolic link in P* pointing to the original generated file. **It does not generate an empty or handwritten identifier map.** Existing conflicting files are never overwritten; the provenance goes into the benchmark JSON.
+3. Starts a dedicated Python worker with cwd set to P* and loads the original **review** SLHA card via its absolute path.
+4. Explicitly requires a fresh output JSON after get_value. Fortran STOP may return exit 0, so simply checking the shell's exit status is unsafe. Worker logs are saved at threshold_benchmarks/M500_tanbeta3_{Z,gamma}/matrix2py_initialization.log.
+
+Reproduce with existing venv (no reinstall or regeneration):
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+The script fails safely if no original ident_card exists anywhere in the standalone. In that case inspect:
+
+    find validation/local_logs/MG5_UL_DL_WZ -name ident_card.dat -ls
+    find validation/local_logs/MG5_UL_DL_WA -name ident_card.dat -ls
+    grep -RIn 'ident_card.dat' validation/local_logs/MG5_UL_DL_WZ/Source | head -25
+
+The independent MG5 matrix-element PASS remains **UNKNOWN** until we obtain numerical ME2 values from both channels and verify EW/mixing/color normalization. The existence of a compiled matrix2py.so is a toolchain success only.
