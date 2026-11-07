@@ -198,3 +198,31 @@ New script scripts/mg5_ew_input_audit.py and tests/test_mg5_ew_input_audit.py is
     .venv-mg5-f2py/bin/python scripts/mg5_ew_input_audit.py --mass 500 --tanbeta 3 --probe
 
 Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_ew_isolation.json. All substituted SLHA cards are diagnostic, not physically consistent MSSM spectra. Stop gate remains NO-GO until exact card and model input consistency is established and independent ME2 comparison agrees.
+
+
+## 2026-11-07: Strong numerical evidence of SLHA fixed-field exponent truncation
+
+The user ran exact-vs-rebuilt review card and one-at-a-time EW-input audit.
+- Original aEWM1=127.934: WZ=0.01292073817016226, Wgamma=0.001589724882844365.
+- Changing ONLY SMINPUTS[1] to 132.6638757554207: WZ=120.15834045063525, Wgamma=14.783884727018979.
+- Ratios: 9299.64982407 and 9299.64982403. Both agree closely with (127.934/1.326638757554207)^2 = 9299.64982404.
+- The old Python SLHA writer formatted aEWM1 as 1.326638757554207E+02, LENGTH 21. A Fortran 20-character field would clip its final digit 2, leaving 1.326638757554207E+0 and hence an effective inverse electromagnetic coupling of 1.326638757554207 rather than 132.6638757554207. This explains the shared enormous squared-amplitude factor *if* the generated reader truncates at 20 characters.
+- MW-only and full-card results may also be badly affected by the same issue, since other updated masses were serialized with 21-character scientific fields.
+- Group-reconstructed wide-format preview and exact wide-format preview produced different MEs even though the internal Python scalar SLHA parser reported equal numeric entries; this reinforces the need to validate Fortran input parsing.
+
+This is a **high-confidence hypothesis of an SLHA numeric serialization defect**, not yet independently confirmed by a controlled Fortran parser A/B test. It does NOT justify claiming the published amplitudes are correct without rerunning the corrected external ME comparisons.
+
+Fix: scripts/mg5_threshold_preflight.py now uses at most 20 characters per written numeric field (format .12E). It writes a NEW param_card_quirkonium_review_compact.dat, preserving the former 21-character param_card_quirkonium_review.dat as historical evidence. scripts/mg5_matrix2py_compare.py requires compact; tests/test_mg5_slha_fieldwidth.py prevents regression.
+
+Decisive test: scripts/mg5_slha_fieldwidth_gate.py uses IDENTICAL original MSSM inputs and exact momenta with three cards: (1) original file, (2) identical numeric aEWM1 rewritten as an 18-character field, (3) identical numeric aEWM1 rewritten as 21-character field. If the old reader clips the E+02 to E+0, the third-to-first squared-amplitude ratio should equal exactly 10000, while the second equals 1. It then evaluates old long-format and new compact preview at the same benchmark momenta.
+
+Commands:
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3 --write-cards
+    .venv-mg5-f2py/bin/python scripts/mg5_slha_fieldwidth_gate.py --mass 500 --tanbeta 3 --channel both
+
+Output: validation/local_logs/threshold_benchmarks/M500_tanbeta3_slha_width_gate.json.
+All original model, Fortran source and SLHA cards preserved.
+
+NO-GO status remains until a genuinely corrected MG5 ME matches the analytic color-averaged target and electroweak model dependence is checked. Novelty/literature risk remains independent.
