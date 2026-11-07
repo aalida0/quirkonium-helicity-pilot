@@ -1,15 +1,16 @@
-# Scoped prior-art matrix (2026-11-07)
+# Primary prior-art matrix — scoped review, 2026-11-07
 
-**Coverage:** targeted primary-source review, not an exhaustive INSPIRE citing/cited audit. An absence of a matching result in this matrix is not proof of novelty.
+**UNKNOWN does not mean that a published result is absent.** Full two-hop INSPIRE citations not retrieved.
 
-| Paper | Model | Spin state | Final states | Integrated rates | Helicity amplitudes | Lepton angular observables | Direct overlap | Evidence |
-|---|---|---|---|---|---|---|---|---|
-| Fok & Kribs, PRD 84 (2011) 035001, arXiv:1106.3101 | Chiral/vectorlike fermionic quirks | S-wave singlet/triplet | Wγ,WZ,WH and others | Yes, App. B | Projector machinery in App. A; channel-by-channel helicity information not established in this audit | Not established | High for widths | https://arxiv.org/abs/1106.3101 |
-| Cheung, Keung & Yuan, NPB (2009), DOI:10.1016/j.nuclphysb.2008.11.029 | Iquarkonium | Charged spin-singlet/triplet | Wγ,WZ and others | Yes | Not verified | Not verified | High for widths, potentially for spin | https://doi.org/10.1016/j.nuclphysb.2008.11.029 |
-| Forsyth, Low, Tenney & Verhaaren, 'Visible collider signals of natural quirks', arXiv:2504.02940 | Scalar doublet squirks | Ground S-wave spin 0 | Wγ,WZ | Yes, App. A.3 eqs. (37)-(41) | Not identified in the reviewed section | Not identified in the reviewed section | High for rates and splitting sensitivity | https://arxiv.org/html/2504.02940 |
-| Kahawala & Kats, JHEP 09 (2011) 099 | Bound states of BSM particles | Spin-comparative | Multiple | Yes | Spin-angular methods need full-text transferability audit | Yes, spin-dependent distributions | Adjacent rather than verified identical | https://doi.org/10.1007/JHEP09(2011)099 |
-| PRD 97 (2018) 015010 | Electroweak-charged hidden-force bound states | To verify | To verify | To verify | To verify | To verify | Potentially adjacent | https://doi.org/10.1103/PhysRevD.97.015010 |
+| Work | Model/state | Overlap | Helicity/angular | Evidence |
+|---|---|---|---|---|
+| Burdman et al., *The Quirky Collider Signals of Folded Supersymmetry* (2008), arXiv:0805.4667 | Scalar squirks | Published Wgamma/WZ integrated rates and collision context | Spin-zero isotropy; full joint leptonic helicities not found in inspected sections | https://arxiv.org/abs/0805.4667 |
+| Cheung, Keung, Yuan, *Phenomenology of iquarkonium* (2008/09) | Fermionic iquarkonium | Charged-state widths | Detailed helicities UNKNOWN | https://doi.org/10.1016/j.nuclphysb.2008.11.029 |
+| Fok & Kribs, *Chiral Quirkonium Decays* (2011), PRD 84 035001 | Fermionic spin 0/1 | App. A projectors, App. B Wgamma/WZ partial widths | W/Z decay angular covariance not fully verified | https://arxiv.org/abs/1106.3101 |
+| Kahawala & Kats, *Distinguishing Spins at the LHC Using Bound State Signals* (2011), JHEP09 099 | BSM bound states | Angular/spin discrimination methods | Adjacent formalism, not verified identical scalar WZ | https://doi.org/10.1007/JHEP09(2011)099 |
+| Li et al., *Electroweak-charged bound states as LHC probes of hidden forces* (2018) | Charged bound states | Adjacent vector-state phenomenology | Identical charged scalar WZ channel not verified | https://doi.org/10.1103/PhysRevD.97.015010 |
+| Joshua D. Forsyth, *Characterizing Quirky Signals* (MS thesis, 2023) | Scalar charged squirkonium | **Analytic Wgamma/WZ amplitudes** and Fig.4.2 mass-splitting branching ratios | Full spin density and WZ angular results not verified | https://scholarsarchive.byu.edu/etd/10659/ |
+| Forsyth, Low, Tenney, Verhaaren, *Visible Collider Signals of Natural Quirks* (2025), PRD 111 115021 | Scalar spin-zero charged squirkonium | **App. A.3 Eqs A.4-A.8** complete integrated rates | Two squared WZ terms, polarization projection not explicitly found in inspected sections | https://arxiv.org/abs/2504.02940 |
+| Same authors, **erratum** (2026), PRD 113 079901 | Same | Restricts Delta = mW^2 cos(2beta)/M; corrects parameter-space regions | Must use corrected model | https://doi.org/10.1103/lwnc-cmpn |
 
-**Critical correction:** The April 2026 erratum to Forsyth et al. DOI 10.1103/lwnc-cmpn must be checked against every viability/mass-splitting assertion. The original 2025 arXiv HTML is pre-erratum.
-
-**Do not claim:** complete citation-network coverage, direct novelty, or independently reproduced amplitudes.
+The scalar helicity projections obtained in the present pilot are new to its code, **not demonstrated novel in the literature**. The 2023 thesis disproves any claim of first analytic charged-squirkonium amplitude calculation. A plotting exercise based solely on decomposition of the 2025 paper's squared width is likely too limited for EPJC/PTEP. Fermionic versus scalar comparison not yet calculated.
