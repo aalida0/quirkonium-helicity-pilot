@@ -1,7 +1,7 @@
 # Charged quirkonium polarization — scalar helicity feasibility pilot
 
 **Research date:** 2026-11-07. **Branch:** research/pilot1-literature-model-gate.
-**Status:** scoped scalar tree-level helicity and source-width validation PASS; complete literature novelty and physical benchmark viability UNKNOWN. No paper or experimental-reach claim.
+**Status (revised after MG5 2026-11-07): published-width and Mathematica/Python numerical checks PASS scoped, but independent MG5 numerical matrix-element benchmark FAILS by factors 2.677e10 (WZ) and 4.599e5 (Wgamma) at M=500 GeV, tanbeta=3; root cause UNKNOWN. All physics interpretation/plot release PAUSED. No paper or experimental-reach claim.**
 
 ## What has been calculated
 
@@ -169,3 +169,16 @@ The updated evaluator finds the genuine generated ident_card.dat and stages a sy
     .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
 
 If the standalone has no ident_card.dat, the script stops with an explicit find command; do not create an empty mapping. The independent numerical matrix-element gate remains UNKNOWN.
+
+
+### Stop gate: independent MG5 amplitude discrepancy
+
+The user ran both compiled MSSM_SLHA2 standalone MEs at M=500 GeV, tanbeta=3. Observed MG5 ME2: WZ = 142350088.3299091; Wgamma = 772.9807959512825, versus our conditional color-averaged analytic targets 0.005317520079460985 and 0.001680692474251963. These are observed failed numeric checks; no rescaling to force agreement is authorized.
+
+Reproduce the diagnostic scan and generated-source audit (does not alter model, cards, or physics):
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    .venv-mg5-f2py/bin/python scripts/mg5_discrepancy_audit.py --mass 500 --tanbeta 3 --probe
+
+The read-only audit extracts original/review SLHA masses and mixing, generated diagrams/color factors and direct MG5 ME values at q=0 (both final-state orientations), q=0.1, 1 GeV and the unmodified original MSSM card. It writes validation/local_logs/threshold_benchmarks/M500_tanbeta3_discrepancy_audit.json. Do not claim physical helicity fractions from this model as externally validated until this countercheck is reconciled.
