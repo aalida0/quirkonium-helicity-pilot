@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 sys.path.insert(0,str(ROOT/"src"))
-from mg5_matrix2py_compare import prepare,external_input_audit
+from mg5_matrix2py_compare import prepare,external_input_audit,build_error_summary
 from scalar_threshold_amplitudes import ALPHA_W,S2,MW,MZ,splitting
 
 class MG5Matrix2PyPreflight(unittest.TestCase):
@@ -49,6 +49,15 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
                 "      CALL LHA_GET_REAL(NPARA,PARAM,VALUE,'aEWM1',AEWM1,1.279340D+02)\n"
                 "      CALL LHA_GET_REAL(NPARA,PARAM,VALUE,'mdl_MW',MDL_MW,7.982901D+01)\n")
         return base
+
+    def test_build_error_summary_keeps_compiler_diagnostic(self):
+        log=("gfortran -c matrix.f\\n"
+             "fatal error: Python.h: No such file or directory\\n"
+             "make: *** [makefile:90: matrix2py.so] Error 1\\n")
+        report=build_error_summary(log,tail_lines=2)
+        self.assertTrue(report["error_lines"])
+        self.assertIn("Python.h", "\\n".join(report["error_lines"]))
+        self.assertIn("Error 1", report["tail"][-1])
 
     def test_accepts_missing_gf_with_review_card(self):
         with tempfile.TemporaryDirectory() as tmp:
