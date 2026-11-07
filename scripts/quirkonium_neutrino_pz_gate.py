@@ -209,14 +209,20 @@ def main():
     p.add_argument("--phis",type=int,default=12)
     p.add_argument("--orientations",type=int,default=5)
     p.add_argument("--rapidities",default="-1,0,1")
+    p.add_argument("--luminosity",type=float,default=3000.)
+    p.add_argument("--assumed_efficiencies",default="1,0.3,0.1",
+                   help="Illustrative combined acceptance/efficiency factors")
     p.add_argument("--output",type=Path,default=ROOT/
        "validation/local_logs/neutrino_pz_ambiguity_gate.json")
     args=p.parse_args()
     if args.mass<=MW+91.1876 or args.high_tanbeta<=1 or args.nodes<3 or args.phis<8 or args.orientations<3:
         p.error("Invalid kinematic range or angular quadrature")
     rapidities=[float(v) for v in args.rapidities.split(",")]
+    efficiencies=[float(v) for v in args.assumed_efficiencies.split(",")]
     if not rapidities or any(abs(y)>4 for y in rapidities):
         p.error("Require comma-separated rapidities with |y| <= 4")
+    if args.luminosity<=0 or not efficiencies or any(e<=0 or e>1 for e in efficiencies):
+        p.error("Require positive luminosity and efficiencies 0 < eff <= 1")
     lo=find_low_branch(args.mass,args.high_tanbeta)
     rows={}
     for label,t in (("low",lo),("high",args.high_tanbeta)):
@@ -229,12 +235,27 @@ def main():
               "known-M a1",f"{v['known_resonance_mass']['a1']:+.7f}",
               "equal-roots a1",f"{v['equal_roots']['a1']:+.7f}",
               "minpz-truth-fraction",f"{v['minpz_correct_fraction']:.3f}")
+    from quirkonium_branch_degeneracy import model_point
+    # No physical signal-production cross section is supplied: instead
+    # calculate the minimum effective production xsec, conditioned on the
+    # ideal clean, signal-only moment test and assumed efficiency factors.
+    branching=model_point(args.mass,args.high_tanbeta)["branch_wz_two_channels"]
+    prompt3lnu=branching*.216*.0673
     costs={}
     for label in ("truth","min_abs_pz","known_resonance_mass","equal_roots"):
-        costs[label]={"3sigma_N":sign_cost(rows["low"],rows["high"],label,3),
-                      "5sigma_N":sign_cost(rows["low"],rows["high"],label,5),
+        count3=sign_cost(rows["low"],rows["high"],label,3)
+        count5=sign_cost(rows["low"],rows["high"],label,5)
+        costs[label]={"3sigma_N":count3,"5sigma_N":count5,
                       "signed_difference":rows["low"][label]["a1"]-
-                                          rows["high"][label]["a1"]}
+                                          rows["high"][label]["a1"],
+                      "low_branch_reconstruction_dilution":
+                        rows["low"][label]["a1"]/rows["low"]["truth"]["a1"],
+                      "high_branch_reconstruction_dilution":
+                        rows["high"][label]["a1"]/rows["high"]["truth"]["a1"],
+                      "minimum_effective_sigma_prod_fb_assuming_background_free":{
+                          str(z):{str(eff):n/(args.luminosity*prompt3lnu*eff)
+                                  for eff in efficiencies}
+                          for z,n in ((3,count3),(5,count5))}}
     truth=(rows["low"]["truth"]["a1"]>0 and
            rows["high"]["truth"]["a1"]<0)
     reconstructed=(rows["low"]["min_abs_pz"]["a1"]>0 and
@@ -242,6 +263,10 @@ def main():
     status=("TOY_OPPOSITE_SIGNS_RETAINED" if truth and reconstructed else
             "TOY_OPPOSITE_SIGNS_LOST_OR_REVERSED")
     out={"status":status,"toy_not_a_collider_forecast":True,
+         "L_fb_inv":args.luminosity,
+         "branch_wz_two_channels":branching,
+         "prompt_3lnu_branching":prompt3lnu,
+         "assumed_efficiencies":efficiencies,
          "truth_opposite_signs":truth,
          "min_abs_pz_opposite_signs":reconstructed,
          "momenta":"WZ on shell; exact MET; no detector; no backgrounds",
@@ -255,6 +280,12 @@ def main():
          "full_fiducial_acceptance":"NOT_EVALUATED"}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(out,indent=2))
+    for label in ("truth","min_abs_pz","known_resonance_mass","equal_roots"):
+        row=costs[label]
+        print(f"{label}: Δa1={row['signed_difference']:+.6f}; "
+              f"3σ ideal-selected N={row['3sigma_N']}; "
+              f"min σ_prod for ε=1: "
+              f"{row['minimum_effective_sigma_prod_fb_assuming_background_free']['3']['1.0']:.2f} fb")
     print("STATUS:",status,"ideal model-conditioned reconstruction only; saved",args.output)
 
 if __name__=="__main__":
