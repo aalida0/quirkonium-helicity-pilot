@@ -12,7 +12,7 @@ A physical spin-zero scalar charged squirkonium in the Forsyth et al. electrowea
 
 - **Known:** integrated scalar Wγ/WZ rates and splitting sensitivity were published in Burdman et al. (2008), Forsyth et al. (2025), and a related thesis *Characterizing Quirky Signals*.
 - **Newly derived in this pilot:** explicit physical-state helicity projection, f00 versus erratum-corrected tanβ and the ideal W→ℓν normalized angular marginal, with benchmark tests.
-- **Not demonstrated as new relative to all literature:** full two-vector spin-density matrix, Z lepton angles, nontrivial azimuthal interference moments, or comparative scalar-versus-fermion observable.
+- **Now derived as a pilot result, but not demonstrated novel relative to all literature:** the ideal on-shell two-vector joint lepton-angle density and the (a_1cos\Phi) (longitudinal–transverse) and (a_2cos2\Phi) interference terms. **Still missing:** comparative scalar-versus-fermion observable and experimental/fiducial treatment.
 - INSPIRE backward/forward citation graph **not completed**, so no novelty certification.
 
 ## Validation gates
@@ -24,10 +24,15 @@ See validation/VALIDATION_REPORT.md. Local 9 tests pass and the independent rate
 1. Complete the canonical INSPIRE references/citations audit, including the 2024/25 *Characterizing Quirky Signals* thesis, and explicitly screen for full joint WZ polarization/azimuth observables.
 2. Independently regenerate one amplitude with FeynRules/MG5, and verify nonabelian identity in general gauge if making a gauge-independent field-theory claim.
 3. Derive joint \(W^+\to\ell^+\nu,\,Z\to\ell^+\ell^-\) spin-density and azimuthal interference, then quantify **nontrivial** differences with an honestly allowed second theory scenario; keep missing angular resolution/unknown formation as uncertainty/limitations.
-4. If joint observables are universal, previously published, too small, or require arbitrary production spin fractions: **NO-GO**, redirect to another quirk idea.
+4. If the joint observables are already published, too small experimentally, or require arbitrary production spin fractions: **NO-GO**, redirect to another quirk idea.
 
 ## Publication referee risk
 
 A severe referee objection is: 'You have only plotted a helicity decomposition that is already implicitly fixed by Forsyth Eq. (A.7), with no nontrivial second model or realistic observable.' This objection is presently valid. A modest EPJC/PTEP publication requires something beyond the current plots and validation.
 
 **Do not misdescribe this pilot as a detector study, validated sensitivity, proof of novelty, or finished manuscript.**
+
+
+## Joint-angle result (new within this pilot)
+
+An on-shell narrow-width W+Z three-angle density was constructed from the LO scalar helicity amplitudes and leptonic W/Z decay currents, including transverse–longitudinal interference. Analytic polar-angle-integrated coefficients \(a_1,a_2\) were derived and tested by independent numeric quadrature; \(a_1\) changes sign across erratum-restricted tanβ. In particular, at M=500 GeV, \(a_1=-0.120305\) for tanβ=3, compared with \(+0.091375\) for tanβ=0.1. Unlike integrated rates, \(a_1\) retains relative helicity sign information. **This remains a conditional pilot result, not a demonstrated novel EPJC contribution.** Prior analytic amplitudes in the 2023 Forsyth thesis and possible already published angular methods remain an explicit referee risk. Detector-level viability and the exact full INSPIRE graph remain unknown.
