@@ -3,8 +3,8 @@
 ## Status (do not promote prepared checks to PASS)
 - Existing Python physics: **14 local tests PASS** (source width, physical Wgamma Ward, ideal joint spin density).
 - Preflight rank-two tensor equivalence checked separately with NumPy at 4 masses × 4 tanbeta × WZ/Wgamma and all physical polarizations: **PASS internally**. This uses the same intended gauge structure; it is **not** Wolfram or an independent generator.
-- Mathematica rank-two tensor (mathematica/validate_scalar_WZ.wl): **PREPARED / NOT EXECUTED** in this environment.
-- MadGraph5 MSSM left-squark EW control (madgraph/mssm_ew_procs.mg5): **PREPARED / NOT EXECUTED** in this environment.
+- Mathematica rank-two tensor (mathematica/validate_scalar_WZ.wl): **USER EXECUTED (2026-11-07)**; printed `PASS Mathematica tensor / published rates / Ward` for the 9 WZ benchmark points, but `N::meprec` warnings occurred for M=250 GeV. The log-based Python comparison originally failed with `ImportError: polarization_fraction`, a comparator-interface bug rather than a physics mismatch. I independently parsed the 9 user-log rows and evaluated the Python reference: all 27 quantities `f00,a1,a2` agreed, maximum absolute residual **1.82e-14**. The corrected GitHub checker now imports `f00` and accepts Wolfram precision suffixes. **A clean Mathematica precision rerun is still required** before claiming the 1e-22 Mathematica arithmetic target.
+- MadGraph5 MSSM left-squark EW control (madgraph/mssm_ew_procs.mg5): **PREPARED / NOT EXECUTED**. User confirmed executable at `$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC`, version directory MG5_aMC_v3_5_1; executable and version have not been checked by a tool.
 - INSPIRE two-hop automated traversal (scripts/inspire_twohop.py): **PREPARED / NOT LIVE-EXECUTED** here; real citation graph and full-text novelty still UNKNOWN.
 
 ## Run on the machine with Mathematica and MG5
@@ -19,14 +19,15 @@ From a clone of this branch:
 Or within a Mathematica kernel: Get["mathematica/validate_scalar_WZ.wl"].
 A **PASS** marker plus the Python cross-validator are required; merely opening Mathematica is not a test.
 
-MadGraph (replace the path with the actual installation):
+MadGraph (user-supplied executable path):
 
-    export MG5_BIN=/path/to/MG5_aMC/bin/mg5_aMC
+    export MG5_BIN="$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC"
+    test -x "$MG5_BIN" && "$MG5_BIN" --version
     ( cd validation/local_logs && "$MG5_BIN" ../../madgraph/mssm_ew_procs.mg5 ) |& tee validation/local_logs/madgraph_generation.log
 
 The second command generates standalone code. **Generation alone is not a matrix-element comparison.** Inspect diagram structure and obtain fixed-color matrix elements at nonzero constituent relative velocity, extrapolate to threshold, document exact MSSM card and pure-left first-generation squarks, and compare with scalar quirkonium kinematics. Hidden IC color ≠ MSSM QCD color; no direct cross-section equivalence. The MG benchmark cannot be called PASS until matching numerical outputs exist.
 
-A semiautomated runner is scripts/run_local_checks.sh (set MG5_BIN first). The original Mathematica version bundled in the downloadable validation kit additionally reports more verbose diagnostics.
+A semiautomated runner is scripts/run_local_checks.sh (set MG5_BIN first). The updated Mathematica script uses 60-digit numeric EW inputs and caches exact elementary Wigner-`d` integrals to avoid enormous exact-radical expressions. **The updated Wolfram script has not been rerun**; do not assume the warnings are eliminated until verified.
 
 ## INSPIRE audit (requires internet)
 
@@ -37,6 +38,10 @@ This retrieves entire first-hop cited/citing lists for core sources and relevanc
     python scripts/inspire_twohop.py --output validation/inspire_audit_full --expand-all
 
 The unrestricted option can mean many API requests. The script caches requests, throttles to respect the public API (15 requests/5s), logs pagination, incomplete edges and failures. Exit 2 means incomplete coverage; never mark novelty closed if errors, partial pages or unresolved core sources remain. **The graph itself cannot substitute for checking the full-text calculations**.
+
+## Evidence preserved
+
+Nine Mathematica `f00,a1,a2` benchmark lines from the user-executed output are stored in `validation/wolfram_benchmark_20261107.txt`. The record explicitly notes the `N::meprec` warnings in the original full log. `tests/test_wolfram_log_regression.py` checks all nine entries with the fixed comparator. Agreement supports the physical tensor and angular conventions within double-precision accuracy; it is **not** an independent FeynRules/MG5 diagram-generation or collider-model validation.
 
 ## Acceptance criteria
 
