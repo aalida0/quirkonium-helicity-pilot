@@ -57,3 +57,11 @@ The 2023 Forsyth thesis already has the charged scalar Wgamma/WZ **analytic ampl
 Refs: https://physics.byu.edu/docs/thesis/1674; https://arxiv.org/abs/1106.3101; https://atlas-public.web.cern.ch/Updates/Physics-Briefing/WZ-Polarisation
 
 **Review decision:** GO for restricted independent validation; NO-GO for expansion to scan/manuscript until independent physics and citation gates close.
+
+## Revalidation on user machine (2026-11-07)
+
+**Mathematica:** After precision mitigation, the user reran `wolframscript -file mathematica/validate_scalar_WZ.wl` and `scripts/compare_wolfram.py`. The full 9-point WZ grid printed `PASS Mathematica tensor / published rates / Ward` without `N::meprec` warnings. The comparator evaluated all 27 quantities `f00,a1,a2` with **0 failures**, maximum absolute difference **1.817e-14**. Upgrade the independent numeric *Mathematica–Python cross-check* to PASS (within double-precision numerical scope). This does not constitute MG5/UFO diagram-level validation or physical model viability.
+
+**MadGraph:** User's MG5_aMC 3.5.1 executable was found and started. Original `import model mssm` failed because this MG5 version requires `MSSM_SLHA2`; all generation commands were skipped. The model card now uses `MSSM_SLHA2`; a postflight checker requires both `SubProcesses/P*/matrix*.f` outputs and fails if error diagnostics appear. **MG5 independent amplitude check: UNKNOWN**, not executed successfully; first retry process generation, then implement a fixed-color numerical matrix-element and threshold comparison.
+
+For source-backed model naming, see ATLAS JobOption/DOxygen examples using `import model MSSM_SLHA2-full` and public MG5 3.x model output. **No claim that the replacement card has already run successfully.**
