@@ -2,7 +2,15 @@
    scalar SU(2) doublet annihilation u dbar -> W+V, V=Z or gamma.
    Mathematica 13+: wolframscript -file mathematica/validate_scalar_WZ.wl
    NOT a FeynRules/UFO or arbitrary-Rxi gauge implementation. *)
-mw=80379/1000; mz=911876/10000; aw=169/5000;
+(* Use 60-digit inputs throughout. Exact rational masses generate enormous
+   intermediate radicals and N::meprec warnings near cancellation points.
+   Wigner d integrals below remain symbolic/exact before EW substitution. *)
+ClearAll["Global`*"];
+$MaxExtraPrecision=200;
+workingPrecision=60;
+mw=N[80379/1000,workingPrecision];
+mz=N[911876/10000,workingPrecision];
+aw=N[169/5000,workingPrecision];
 s=1-mw^2/mz^2; c=1-s; qu=2/3; qd=-1/3;
 metric=DiagonalMatrix[{1,-1,-1,-1}];
 low[v_]:=metric.v;
@@ -59,11 +67,13 @@ dspin[-1,1,x_]:=(1-x)/2;
 dspin[1,-1,x_]:=(1-x)/2;
 dspin[0,-1,x_]:=-Sqrt[1-x^2]/Sqrt[2];
 dspin[-1,-1,x_]:=(1+x)/2;
-iw[i_,j_]:=iw[i,j]=Integrate[dspin[i,1,x]dspin[j,1,x],{x,-1,1}];
-iz[i_,j_]:=iz[i,j]=FullSimplify[(
- s^2 iw[i,j]+(-1/2+s)^2
- Integrate[dspin[i,-1,x]dspin[j,-1,x],{x,-1,1}])/
- (s^2+(-1/2+s)^2)];
+(* Exact elementary spin-1 polar integrals, cached independently of the
+   numerical electroweak couplings to avoid huge symbolic expressions. *)
+baseMoment[i_,j_,h_]:=baseMoment[i,j,h]=
+ Integrate[dspin[i,h,x]dspin[j,h,x],{x,-1,1}];
+iw[i_,j_]:=baseMoment[i,j,1];
+iz[i_,j_]:=(s^2 baseMoment[i,j,1]+(-1/2+s)^2 baseMoment[i,j,-1])/
+ (s^2+(-1/2+s)^2);
 angleCoeff[B_,n_]:=Module[{hs={-1,0,1},h,norm},
  h=<|-1->-B["T"],0->B["L"],1->-B["T"]|>;
  norm=Total[Table[h[k]^2 iw[k,k]iz[k,k],{k,hs}]];
