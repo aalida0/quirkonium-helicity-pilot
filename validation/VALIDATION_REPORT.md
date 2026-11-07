@@ -90,3 +90,15 @@ The postflight script `scripts/check_mg5_generation.py` reported:
 **Upgrade:** independent **MG5 process generation** PASS (user-supplied log). **Do not upgrade** the independent *matrix-element value* or *physics model consistency* gate: neither `SMATRIX` nor equivalent has yet been evaluated at matched kinematics, and the EW input/mass cards and initial color average were not examined. The generated MSSM color representation is different from IC. Expected at fixed color for a single color-diagonal EW amplitude: the MG5 initial-color-averaged amplitude squared is the fixed-color quirk amplitude squared divided by 3; inspect the generated `IDEN` and color matrix before applying this relation. 
 
 New scripts `scripts/mg5_threshold_preflight.py` and `scripts/mg5_evaluate_threshold.py` prepare exact threshold 4-momenta, matched *copies* of SLHA input cards, explicit expected reference amplitudes, and—**only if supported by the generated check_sa.f**—an exact `PS.input` standalone check. They must be executed on the user machine before any MG5 numerical PASS claim. Model matching must check first-generation squark flavor/mixing matrices, coupling order diagrams, gauge scheme, zero-width convention and color averaging. They do not implement a separate SU(3)_IC UFO.
+
+
+### Addendum — MG5 SLHA2 absent GF input (2026-11-07)
+
+User ran the updated repository: **22 Python unit tests PASS in 3.204 s** (user-reported). They then ran `mg5_threshold_preflight.py --mass 500 --tanbeta 3` both read-only and with `--write-cards`. Both aborted before producing the WZ manifest with:
+`RuntimeError: .../MG5_UL_DL_WZ/Cards/param_card.dat lacks required entries {('SMINPUTS', 2)}`.
+
+This is **not an amplitude-level physics failure**. The preflight's assumption that every generated MSSM_SLHA2 card must contain external GF at `SMINPUTS[2]` is not justified by source inspection of the user's actual standalone model. Conventional SLHA2 uses this code for GF, but the generated UFO might have a different input scheme; its `parameters.py`/Fortran `Source/MODEL` must be checked.
+
+**Code fix committed, not yet user-run:** make missing `SMINPUTS[2]` nonfatal for read-only/report and `--write-cards` review copies; record present SMINPUTS codes and the generated model's EW source clues; keep `--apply` **blocked** when the EW scheme is unknown. Regression tests added using synthetic GF-missing SLHA cards. Because the model's external EW basis and numerical generated matrix elements are unverified, **MG5 numerical physics validation remains UNKNOWN**. Do not manufacture a GF entry or imply a new physics discrepancy.
+
+User-machine next gate: rerun preflight, inspect `electroweak_input_audit` and `model_EW_source_hints` in the JSON, then decide which external independent EW inputs must be matched. Only after that may we compile and compare a fixed-color threshold SMATRIX with the analytic target.
