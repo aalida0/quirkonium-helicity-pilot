@@ -135,9 +135,12 @@ def audit_one(base,channel,mass,tb,probe):
         provenance=stage_ident_card(model,work)
         result["ident_card"]=provenance
         ps_cases={
-          "matched_q0":(review,b.mu,b.md,MW,b.mv,0.),
-          "matched_q0p1":(review,b.mu,b.md,MW,b.mv,.1),
-          "matched_q1":(review,b.mu,b.md,MW,b.mv,1.)
+          # At q=0 the initial scalars are both at rest: the ME2 must be
+          # independent of the common final-state 3-axis orientation.
+          "matched_q0_aligned":(review,b.mu,b.md,MW,b.mv,0.,0.),
+          "matched_q0_rotated":(review,b.mu,b.md,MW,b.mv,0.,.35),
+          "matched_q0p1":(review,b.mu,b.md,MW,b.mv,.1,.35),
+          "matched_q1":(review,b.mu,b.md,MW,b.mv,1.,.35),
         }
         du=default.get(("MASS",1000002))
         dd=default.get(("MASS",1000001))
@@ -145,16 +148,16 @@ def audit_one(base,channel,mass,tb,probe):
         dmv=default.get(("MASS",23)) if channel=="Z" else 0.
         if all(x is not None and x>0 for x in (du,dd,dmw)) and (
                 channel=="gamma" or (dmv is not None and dmv>0)):
-            ps_cases["original_card_q0"]=(original_card,du,dd,dmw,dmv,0.)
+            ps_cases["original_card_q0"]=(original_card,du,dd,dmw,dmv,0.,.35)
         results={}
-        for label,(card,mu,md,mw,mv,q) in ps_cases.items():
-            pp=ps_at_relative_q(mu,md,mw,mv,q)
+        for label,(card,mu,md,mw,mv,q,theta) in ps_cases.items():
+            pp=ps_at_relative_q(mu,md,mw,mv,q,theta)
             directory=base/"threshold_benchmarks"/f"M{mass:g}_tanbeta{tb:g}_{channel}"/"discrepancy_probe"/label
             directory.mkdir(parents=True,exist_ok=True)
             try:
                 value=evaluate_in_worker(work,card,pp,.118,directory)
                 results[label]={"status":"EVALUATED","value":value,
-                                "momenta":pp,"card":str(card),"q":q}
+                                "momenta":pp,"card":str(card),"q":q,"angle_rad":theta}
             except Exception as exc:
                 results[label]={"status":"ERROR","error":str(exc),
                                 "momenta":pp,"card":str(card),"q":q}
