@@ -237,10 +237,13 @@ def main():
                                           rows["high"][label]["a1"]}
     truth=(rows["low"]["truth"]["a1"]>0 and
            rows["high"]["truth"]["a1"]<0)
-    r=rows["low"]["min_abs_pz"]["a1"]-rows["high"]["min_abs_pz"]["a1"]
-    status=("TOY_SIGN_RETAINED" if truth and r>0 else
-            "TOY_SIGN_LOST_OR_REVERSED")
+    reconstructed=(rows["low"]["min_abs_pz"]["a1"]>0 and
+                   rows["high"]["min_abs_pz"]["a1"]<0)
+    status=("TOY_OPPOSITE_SIGNS_RETAINED" if truth and reconstructed else
+            "TOY_OPPOSITE_SIGNS_LOST_OR_REVERSED")
     out={"status":status,"toy_not_a_collider_forecast":True,
+         "truth_opposite_signs":truth,
+         "min_abs_pz_opposite_signs":reconstructed,
          "momenta":"WZ on shell; exact MET; no detector; no backgrounds",
          "resonance_rapidity_distribution":"uniform over explicit test points, NOT pp production",
          "rapidities":rapidities,"nodes":args.nodes,"phis":args.phis,
