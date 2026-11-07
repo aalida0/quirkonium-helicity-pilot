@@ -51,6 +51,20 @@ def parse_card(s):
             except ValueError:pass
     return values,widths
 
+def format_slha_number(value):
+    """Serialize with <=20 characters for legacy MG5 SLHA/LHA readers.
+
+    The previous .15E precision emitted 21 characters for positive values,
+    e.g. 1.326638757554207E+02. A 20-character field can truncate E+02
+    to E+0, changing alpha_EM and amplitudes by orders of magnitude.
+    .12E preserves roughly 13 significant digits and fits a <=20-char field
+    even for negative values with three-digit exponents.
+    """
+    result=f"{value:.12E}"
+    if len(result)>20:
+        raise ValueError(f"SLHA floating point field too wide: {result}")
+    return result
+
 def replace_card(text,updates):
     block=None;found=set();out=[]
     for line in text.splitlines(keepends=True):
@@ -63,7 +77,7 @@ def replace_card(text,updates):
             block=None;key=("DECAY",int(d.group(2)))
             if key in updates:
                 found.add(key)
-                prefix=d.group(1)+f"{updates[key]:.15E}"+d.group(4)
+                prefix=d.group(1)+format_slha_number(updates[key])+d.group(4)
                 out.append(prefix+("#"+comment if sep else "\n"))
             else:out.append(line)
             continue
@@ -73,7 +87,7 @@ def replace_card(text,updates):
                 key=(block,int(m.group(2)))
                 if key in updates:
                     found.add(key)
-                    prefix=m.group(1)+f"{updates[key]:.15E}"+m.group(4)
+                    prefix=m.group(1)+format_slha_number(updates[key])+m.group(4)
                     out.append(prefix+("#"+comment if sep else "\n"))
                     continue
         out.append(line)
@@ -215,9 +229,10 @@ def run():
                  "missing_optional_card_entries":[str(x) for x in updates if x not in found],
                  "PS_input":str(psfile),**reference(b)}
         if args.write_cards:
+            # Preserve earlier wide-format review card for reproducibility.
             # This is a review copy, not necessarily a physically matched
             # input card (in particular when SMINPUTS[2] is absent).
-            dest=card.with_name("param_card_quirkonium_review.dat")
+            dest=card.with_name("param_card_quirkonium_review_compact.dat")
             dest.write_text(matched)
             payload["matched_card"]=str(dest)
             if args.apply:
@@ -241,6 +256,7 @@ def run():
     if not args.write_cards:
         print("Model cards unmodified (read-only). Add --write-cards to create copies.")
     elif not args.apply:
-        print("SLHA review copies created, NOT activated.")
+        print("Compact-width SLHA review copies created, NOT activated.")
+        print("Old 21-character review files (if any) have been preserved.")
         print("Verify UFO EW input scheme before --apply or actual ME evaluation.")
 if __name__=="__main__":run()
