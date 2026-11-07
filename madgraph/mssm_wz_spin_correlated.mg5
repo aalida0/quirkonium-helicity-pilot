@@ -1,0 +1,13 @@
+# MG5_aMC v3.5 standalone resonant W+Z -> e+ ve mu+ mu- amplitude.
+# Research purpose: independent full spin-correlated 2->4 ME tests of
+# signed W/Z decay-plane azimuthal interference, not a collider simulation.
+# MSSM_SLHA2 first-generation left squarks are electroweak proxies for
+# the scalar SU(2)_L doublet; they carry QCD, not infracolor.
+# Must use a compact SLHA card matching the 2->2 scalar benchmark and
+# NONZERO physical W/Z widths: zero widths at exact on-shell resonances
+# make the 2->4 Breit-Wigner amplitude singular.
+# Output is new standalone folder, leaving 2->2 validations untouched.
+set gauge unitary
+import model MSSM_SLHA2
+generate ul dl~ > w+ z QCD=0 QED=2, w+ > e+ ve, z > mu+ mu-
+output standalone MG5_UL_DL_WZ_3LNU -f
