@@ -15,7 +15,7 @@ Candidate charged composite is U Dbar (Q=+1), with ^1S_0 and ^3S_1 investigated 
 
 ## Candidate 2: scalar bound state
 
-Use the explicit scalar SU(3)_IC doublet model in Forsyth et al. (2025), §3 and App. A.3, **with its April 2026 erratum**. Avoid transferring fermionic wavefunction/spin projectors to scalar constituents. The scalar masses and splitting must arise from the actual scalar mass matrix and be compatible with the erratum; a free splitting is merely exploratory until a complete scalar potential and electroweak constraints are checked.
+Use the explicit scalar SU(3)_IC doublet model in Forsyth et al. (2025), §3 and App. A.3, **with its April 2026 erratum**. Avoid transferring fermionic wavefunction/spin projectors to scalar constituents. The corrected restricted mass splitting in the 2026 erratum is Δ = m_W² cos(2β)/M = (m_W²/M)(1−tan²β)/(1+tan²β), with the erratum displaying 0.1 ≤ tanβ ≤ 10. This relation applies to the paper's stated approximation (lifted singlets and neglected off-diagonal mixing), not arbitrary scalar models. The scalar masses and splitting must arise from the actual scalar mass matrix and be compatible with the erratum; a free splitting is merely exploratory until a complete scalar potential and electroweak constraints are checked.
 
 ## Universal facts
 - Charged spin-zero → W γ (both on shell): W longitudinal helicity amplitude forbidden by angular momentum/helicity selection rules. If Wγ width vanishes due to charges/couplings, no W polarization fraction exists in that channel.
