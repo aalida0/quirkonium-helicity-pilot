@@ -92,3 +92,22 @@ python scripts/check_mg5_generation.py validation/local_logs/madgraph_generation
 ```
 
 Do not mistake the script returning to a shell for generation success: the checker verifies both standalone matrix outputs and the absence of MadGraph error markers. Passing this check is **generation only**, not a matrix-element physics validation.
+
+
+## 2026-11-07: Standalone generation PASS, actual matrix-element comparison next
+
+The user ran MG5_aMC **3.5.1** with `MSSM_SLHA2`. Generated:
+- `validation/local_logs/MG5_UL_DL_WZ/SubProcesses/P1_uldlx_wpz/matrix.f`
+- `validation/local_logs/MG5_UL_DL_WA/SubProcesses/P1_uldlx_wpa/matrix.f`
+
+`scripts/check_mg5_generation.py` reported **PASS** for generation. This is *not* the numeric matrix-element validation yet.
+
+Read-only benchmark and color/parameter preflight (no change to default cards):
+
+```bash
+git pull --ff-only origin research/pilot1-literature-model-gate
+python -m unittest discover -s tests -v
+python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3
+```
+
+The preflight writes `PS.input` and a JSON report. Before using its optional `--write-cards --apply` mode, check the generated MSSM model mass, gauge input and first-generation squark mixing conventions. If `check_sa.f` supports `READPS`, `scripts/mg5_evaluate_threshold.py` can compile/run a reproducible single-point check and save its raw result. No independent amplitude PASS is assigned until actual MadGraph values are inspected, including the generated initial-color denominator. See `madgraph/README.md` for full instructions and benchmark targets.
