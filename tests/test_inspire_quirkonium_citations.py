@@ -5,7 +5,8 @@ from unittest.mock import patch
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from inspire_quirkonium_citations import citations,small_record,references
+from inspire_quirkonium_citations import (citations,small_record,references,
+    validate_citation_cross_checks)
 
 class TestInspireGraph(unittest.TestCase):
     @staticmethod
@@ -41,6 +42,50 @@ class TestInspireGraph(unittest.TestCase):
             x=citations("123",max_pages=2)
         self.assertFalse(x["complete"])
         self.assertTrue(x["errors"])
+
+    def test_missing_known_2025_to_2008_citation_is_inconsistent(self):
+        data={
+          "scalar_2008":{
+            "arxiv":"0805.4667","metadata":{
+              "recid":"108","arxiv":["0805.4667"],"citation_count":0},
+            "forward":{"total":0,"items":[]}},
+          "scalar_2025":{
+            "arxiv":"2504.02940","metadata":{
+              "recid":"125","arxiv":["2504.02940"],"citation_count":2},
+            "forward":{"total":2,"items":[]}},
+        }
+        issues=validate_citation_cross_checks(data)
+        self.assertTrue(any(x["type"]=="MISSING_DOCUMENTED_CITATION"
+                            and x["expected_citing_recid"]=="125"
+                            for x in issues))
+
+    def test_cited_relation_present_and_ids_match(self):
+        data={
+          "scalar_2008":{
+            "arxiv":"0805.4667","metadata":{
+              "recid":"108","arxiv":["0805.4667"],"citation_count":1},
+            "forward":{"total":1,"items":[{"recid":"125"}]}},
+          "scalar_2025":{
+            "arxiv":"2504.02940","metadata":{
+              "recid":"125","arxiv":["2504.02940v2"],"citation_count":0},
+            "forward":{"total":0,"items":[]}},
+        }
+        self.assertEqual(validate_citation_cross_checks(data),[])
+
+    def test_citation_metadata_count_disagreement_detected(self):
+        data={
+          "scalar_2008":{
+            "arxiv":"0805.4667","metadata":{
+              "recid":"108","arxiv":["0805.4667"],"citation_count":35},
+            "forward":{"total":0,"items":[]}},
+          "scalar_2025":{
+            "arxiv":"2504.02940","metadata":{
+              "recid":"125","arxiv":["2504.02940"],"citation_count":2},
+            "forward":{"total":2,"items":[]}},
+        }
+        issues=validate_citation_cross_checks(data)
+        self.assertTrue(any(x["type"]=="COUNT_DISAGREEMENT"
+                            for x in issues))
 
     def test_references_preserve_existing_external_ids(self):
         paper={"metadata":{"references":[{"record":{"$ref":"https://inspirehep.net/api/literature/5"},
