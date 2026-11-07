@@ -20,6 +20,55 @@ API="https://inspirehep.net/api"
 SEEDS={"scalar_2008":"0805.4667","fermionic_2011":"1106.3101",
        "spin_bound_states_2011":"1103.3503","scalar_2025":"2504.02940"}
 RELEVANT=re.compile(r"quirk|squirk|polariz|helicit|angular|diboson|spin",re.I)
+# Independent journal bibliography confirms the 2025 paper cites the 2008
+# paper: Forsyth et al., PRD 111 115021 (2025), reference [51], cites
+# Burdman et al., PRD 78 075028 (2008), arXiv:0805.4667.
+KNOWN_CITING_RELATIONS=(("scalar_2008","scalar_2025",
+    "https://journals.aps.org/prd/abstract/10.1103/34xj-vz82 (ref. 51)"),)
+
+def normalize_arxiv(value):
+    return re.sub(r"v[0-9]+$","",str(value).strip(),flags=re.I)
+
+def validate_citation_cross_checks(seeds):
+    """Detect resolved-seed and pagination-success cases missing known edges.
+
+    This is not a full citation audit: a false positive may reflect missing
+    INSPIRE reference mapping. Either way, do NOT report graph complete.
+    """
+    issues=[]
+    for label,item in seeds.items():
+        meta=item.get("metadata",{})
+        incoming=meta.get("citation_count")
+        got=item.get("forward",{}).get("total")
+        if isinstance(incoming,int) and isinstance(got,int):
+            if incoming>=5 and (incoming-got)>max(5,0.2*incoming):
+                issues.append({
+                    "type":"COUNT_DISAGREEMENT","seed":label,
+                    "metadata_citation_count":incoming,
+                    "forward_search_total":got,
+                    "reason":"INSPIRE count vs citing-query gap exceeds tolerance"})
+        if "metadata" in item:
+            expected=normalize_arxiv(item.get("arxiv",""))
+            actual=[normalize_arxiv(a) for a in meta.get("arxiv",[])]
+            if expected not in actual:
+                issues.append({"type":"SEED_RESOLUTION_MISMATCH",
+                    "seed":label,"requested":expected,
+                    "resolved_ids":actual,"recid":meta.get("recid")})
+    for cited,citing,source in KNOWN_CITING_RELATIONS:
+        cited_item=seeds.get(cited,{})
+        citing_item=seeds.get(citing,{})
+        citing_id=citing_item.get("metadata",{}).get("recid")
+        if not citing_id:continue
+        hits=cited_item.get("forward",{}).get("items",[])
+        ids={hit.get("recid") for hit in hits}
+        if citing_id not in ids:
+            issues.append({"type":"MISSING_DOCUMENTED_CITATION",
+                "cited_seed":cited,"citing_seed":citing,
+                "expected_citing_recid":citing_id,"source":source,
+                "reason":"2025 paper's printed bibliography cites 2008 paper "
+                         "but INSPIRE forward list omits it"})
+    return issues
+
 
 def fetch_json(url,timeout=20):
     last=None
@@ -116,11 +165,20 @@ def main():
                   "forward":citations(recid,args.max_pages)}
         evidence["unsearched_relevant_second_hops"]=[
             hit for recid,hit in list(relevant.items())[args.max_second_hop:]]
+    evidence["citation_integrity_issues"]=validate_citation_cross_checks(
+        evidence["seeds"])
+    for issue in evidence["citation_integrity_issues"]:
+        print("CITATION_INTEGRITY_WARNING:",json.dumps(issue))
+    for issue in evidence["citation_integrity_issues"]:
+        label=issue.get("seed") or issue.get("cited_seed")
+        if label and label in evidence["seeds"]:
+            evidence["seeds"][label]["status"]="INCONSISTENT"
     first=all(x["status"]=="COMPLETE" for x in evidence["seeds"].values())
     second=(args.depth==1 or (
         not evidence.get("unsearched_relevant_second_hops") and
         all(x["forward"]["complete"] for x in evidence["second_hop"].values())))
-    evidence["complete_requested_scope"]=bool(first and second)
+    evidence["complete_requested_scope"]=bool(
+        first and second and not evidence["citation_integrity_issues"])
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False))
     print("Saved",args.output,"complete_requested_scope=",
