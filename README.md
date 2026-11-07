@@ -390,3 +390,55 @@ The sign-sensitive two-branch mechanism is LO/scoped. UV viability
 for tanbeta<1, full model-state populations, novel prior art and
 measurability at the LHC remain UNKNOWN. See
 madgraph/SPIN_CORRELATED_3LNU_PLAN.md.
+
+
+### 2026-11-08 — focused feasibility stop gates (new code; local rerun pending)
+
+The novelty review established that generic spin-zero diboson helicity
+interference is prior art. For a credible quirk-specific parameter-inference
+claim, we must test (1) whether the low-tanbeta branch has at least a
+coherent scalar-doublet mass origin, and (2) whether its opposite signed
+a1 can survive the neutrino two-root ambiguity without detector simulation.
+
+New code and documentation:
+- scripts/quirkonium_model_domain_gate.py: reconstructs a common
+  first-generation SU(2) left-doublet soft mass using original 2025
+  D-term equations plus corrected 2026 splitting; provides a stated
+  weak-scale type-II top-Yukawa diagnostic; conditional absolute-width
+  ratios and necessary clean trilepton production thresholds. This
+  does NOT establish UV viability, which remains UNKNOWN.
+- scripts/quirkonium_neutrino_pz_gate.py: weighs the analytical
+  spin-correlated WZ -> e+nu mu+mu- angular density, rotates W direction
+  relative to beam and applies illustrative longitudinal parent boosts,
+  solves both neutrino-pz roots from perfect missing pT and mW, and
+  reconstructs the charge-labelled joint Phi in helicity frames.
+  Compares truth, smaller |pz|, reconstructed WZ mass closest to known
+  M (optimistic), and equal-root average, and reports coefficient
+  dilution and conditional selected signal/production requirements.
+  No detector, production rapidity distribution, backgrounds or
+  physical UV checks are included.
+- tests/test_quirkonium_feasibility_gates.py: source-convention checks,
+  mass relation, pz quadratic solutions and known-neutrino angular closure.
+- validation/FEASIBILITY_STOP_GATES_2026-11-08.md: source equations,
+  clear physics STOP/UNKNOWN gates, complete commands.
+
+    cd ~/quirkonium-helicity-pilot
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/quirkonium_model_domain_gate.py --masses 250 500 1000 2000
+    python scripts/quirkonium_neutrino_pz_gate.py \
+        --mass 500 --high-tanbeta 3 --nodes 5 --phis 12 \
+        --orientations 5 --rapidities=-1,0,1
+
+A separate assistant-side exploratory integration of the same ideal
+helicity distribution (NOT the committed script or physical pp
+production) found min-|pz| retained opposite interference signs
+but reduced |a1| from about 0.12 to roughly 0.04--0.05. This varied
+with coarse angular quadrature; DO NOT treat it as robust sensitivity
+or a user-run validation. Needed clean trilepton event counts could
+increase dramatically. A denser quadrature and multiple boost
+ensembles must be compared.
+
+The user's 69-test and independent spin-correlated six-leg MG5
+validation PASS remain. The new feasibility scripts and new regression
+tests are COMMITTED but NOT YET RUN on the user's workstation.
