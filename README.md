@@ -315,3 +315,34 @@ Signed a1 depends on a complex relative helicity phase not independently
 checked by the squared results. Neither branch physical viability
 nor the novelty and collider feasibility of the sign ambiguity have
 been certified. Conditional GO for narrowly testing those gaps only.
+
+
+### 2026-11-07 next phase: 2-to-4 decay-chain amplitude (not yet run)
+
+To independently validate the SIGN of a1, the helicity-summed and
+LL/TT-squared MG5 checks are insufficient. A new, separate standalone
+MG5 generator process with full resonant spin correlation was added:
+
+    madgraph/mssm_wz_spin_correlated.mg5
+
+    cd ~/quirkonium-helicity-pilot
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    cd validation/local_logs
+    "$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC"       "$HOME/quirkonium-helicity-pilot/madgraph/mssm_wz_spin_correlated.mg5"
+    find MG5_UL_DL_WZ_3LNU -name matrix.f -o -name param_card.dat
+
+Output: a NEW standalone MG5_UL_DL_WZ_3LNU. It is a resonant
+W+Z -> e+ ve mu+ mu- matrix element, NOT detector simulation.
+**WARNING:** The 2-to-2 reviewed card has ZERO W/Z widths. For the
+2-to-4 on-shell W/Z amplitude, use a separate compact SLHA card with
+nonzero physical W/Z Breit-Wigner widths. Do not overwrite original
+or 2-to-2 review cards. Full stage-by-stage procedure, including
+charged-lepton angular frames and exact momentum validation, is at
+madgraph/SPIN_CORRELATED_3LNU_PLAN.md. The current tool only generates
+the process; a successful generation is NOT an external a1 PASS.
+
+The local INSPIRE graph's 2008 zero-citation 'complete' status
+contradicts the actual 2025 APS bibliography (reference 51).
+Updated crawler has explicit seed-identifier and known-edge integrity
+tests; rerun is required and publication-novelty certification remains
+UNKNOWN.
