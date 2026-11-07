@@ -151,6 +151,93 @@ def compile_extension(work,logdir):
         raise RuntimeError("make returned 0 but no matrix2py shared library appeared")
     return candidates
 
+def stage_ident_card(model_dir,work):
+    """Ensure model's EXISTING ident_card.dat is visible to the Fortran reader.
+
+    The generated LHA reader searches the working directory and its parents.
+    When the canonical file is stored under Source/MODEL, link to it in the
+    generated P* working directory. Never invent identity mappings or overwrite
+    a user-provided identity file.
+    """
+    model_dir=model_dir.resolve()
+    work=work.resolve()
+    ancestors=[work,*work.parents]
+    for ancestor in ancestors:
+        existing=ancestor/"ident_card.dat"
+        if existing.is_file():
+            return {"found":True,"path":str(existing),
+                    "staged":False,"method":"already_in_parent_search_path"}
+        if ancestor==model_dir:
+            break
+    candidates=[
+        model_dir/"Source/MODEL/ident_card.dat",
+        model_dir/"Cards/ident_card.dat",
+        model_dir/"Source/ident_card.dat",
+        model_dir/"ident_card.dat",
+    ]
+    candidates=[p for p in candidates if p.is_file()]
+    if not candidates:
+        # Some generators put it in a less common directory. Inspect only the
+        # generated standalone, never search across unrelated installations.
+        candidates=sorted(model_dir.rglob("ident_card.dat"))
+        candidates=[p for p in candidates if p.is_file()]
+    if not candidates:
+        raise RuntimeError(
+            f"Existing ident_card.dat not found anywhere under {model_dir}. "
+            "Fortran initialisemodel stops before get_value; do not create an "
+            "empty or hand-written ident_card.dat. Inspect Source/MODEL and "
+            "the generated lha_read.f. Command: find "+
+            str(model_dir)+" -name ident_card.dat -ls")
+    if len(candidates)>1:
+        import hashlib
+        hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in candidates}
+        if len(hashes)!=1:
+            raise RuntimeError(
+                "Multiple different ident_card.dat files inside standalone: "+
+                ", ".join(str(p) for p in candidates)+
+                ". Do not choose arbitrarily.")
+    selected=candidates[0].resolve()
+    staged=work/"ident_card.dat"
+    if staged.exists() or staged.is_symlink():
+        if staged.is_file() and staged.resolve()==selected:
+            return {"found":True,"path":str(staged),"source":str(selected),
+                    "staged":True,"method":"existing_identical_symlink_or_file"}
+        raise RuntimeError(f"Refusing to replace existing ident card: {staged}")
+    staged.symlink_to(selected)
+    return {"found":True,"path":str(staged),"source":str(selected),
+            "staged":True,"method":"symlink_original_generated_metadata"}
+
+def evaluate_in_worker(work,review,ps,alpha_s,logdir):
+    """Run Fortran in generated P* directory; detect silent STOP (even exit 0)."""
+    inputs=logdir/"matrix2py_momenta.json"
+    outputs=logdir/"matrix2py_worker_result.json"
+    transcript=logdir/"matrix2py_initialization.log"
+    inputs.write_text(json.dumps(ps,indent=2))
+    if outputs.exists():outputs.unlink()  # Never reuse a stale success.
+    command=[sys.executable,str(ROOT/"scripts/mg5_matrix2py_worker.py"),
+             "--model-card",str(review.resolve()),
+             "--momenta",str(inputs.resolve()),"--output",str(outputs.resolve()),
+             "--alpha-s",str(alpha_s)]
+    try:
+        result=subprocess.run(command,cwd=work,capture_output=True,
+                              text=True,timeout=60)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"MG5 Fortran worker timed out: {exc}") from exc
+    transcript.write_text("$ "+" ".join(command)+"\n"+
+                          result.stdout+"\n"+result.stderr)
+    if result.returncode or not outputs.is_file():
+        raise RuntimeError(
+            "MadGraph initialisemodel/get_value did not return a numerical "
+            "result (Fortran STOP may exit with code 0). "
+            f"Worker exit={result.returncode}; see {transcript}. "
+            "Likely missing ident_card.dat/working-directory/model input; "
+            "do not report a physics PASS.")
+    data=json.loads(outputs.read_text())
+    if data.get("worker_status")!="ME_EVALUATED":
+        raise RuntimeError(f"Worker result did not certify get_value: {data}")
+    print(result.stdout,end="")
+    return float(data["mg5_me2"])
+
 def run():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--channel",required=True,choices=list(LABELS))
@@ -176,21 +263,9 @@ def run():
             raise RuntimeError("--no-build but no existing matrix2py shared library")
     else:
         compile_extension(work,logdir)
-    import numpy as np
-    if "matrix2py" in sys.modules:
-        raise RuntimeError("One process per Python interpreter; use separate CLI calls")
-    sys.path.insert(0,str(work))
-    matrix2py=importlib.import_module("matrix2py")
-    init=getattr(matrix2py,"initialisemodel",None)
-    get=getattr(matrix2py,"get_value",None)
-    if not callable(init) or not callable(get):
-        raise RuntimeError("Generated extension does not expose initialisemodel/get_value. "
-                           f"Found {sorted(k for k in dir(matrix2py) if not k.startswith('_'))[:40]}")
-    print("Loading review card (original remains unmodified):",review)
-    init(str(review))
-    # MadGraph uses P(0:3, NEXTERNAL), Fortran column-major.
-    four=np.asfortranarray(np.array(ps,dtype=np.float64).T)
-    value=float(get(four,args.alpha_s,-1))
+    provenance=stage_ident_card(directory,work)
+    print("Generated ident_card.dat lookup:",json.dumps(provenance,sort_keys=True))
+    value=evaluate_in_worker(work,review,ps,args.alpha_s,logdir)
     analytic=reference(b)
     fixed=analytic["analytic_fixed_color_helicity_sum"]
     target=analytic["candidate_MG5_color_averaged_if_denominator_3"]
@@ -204,7 +279,8 @@ def run():
     print("Numerical ratio is diagnostic. Audit external mixing, diagrams, "
           "color denominator and angular conventions before assigning PASS.")
     output={"channel":args.channel,"mass":args.mass,"tanbeta":args.tanbeta,
-            "ew_source_audit":ew,"mass_card_review":str(review),
+            "ew_source_audit":ew,"ident_card_provenance":provenance,
+            "mass_card_review":str(review),
             "matrix":str(work/"matrix.f"),"momenta":ps,"alpha_s":args.alpha_s,
             "mg5_color_averaged_me2":value,**analytic,
             "ratio_to_expected_color_average":ratio,
