@@ -1,10 +1,10 @@
 # Pilot decision — 2026-11-07
 
-**Current decision: CONDITIONAL GO for a narrow WZ angular-extension pilot; NO-GO for claiming a publishable new result now.**
+**Current decision (revised after MG5 2026-11-07): NO-GO for quantitative physics conclusions or manuscript development until the independent matrix-element discrepancy is resolved. Diagnostic validation work only.**
 
 ## Established result
 
-A physical spin-zero scalar charged squirkonium in the Forsyth et al. electroweak charge representation has fully evaluated tree-level physical amplitudes for \(W^+Z\) and \(W^+\gamma\), including scalar exchanges, seagull, virtual W*. Helicity-summed widths reproduce source integrated rates, and photon Ward tests pass. The 2026 erratum D-term splitting \(\Delta=m_W^2\cos2\beta/M\) yields dramatic WZ fraction changes, e.g., \(f_{00}=0.001938\) (tanβ=1) versus \(0.935846\) (tanβ=10) at M=500 GeV. The wavefunction factor cancels from this fixed-state LO ratio.
+The source-matched Python/Mathematica implementation calculates nominal tree-level scalar charged squirkonium amplitudes for \(W^+Z\) and \(W^+\gamma\), including scalar exchanges, seagull, virtual W*. Helicity-summed widths reproduce source integrated rates, and photon Ward tests pass. The 2026 erratum D-term splitting \(\Delta=m_W^2\cos2\beta/M\) yields dramatic WZ fraction changes, e.g., \(f_{00}=0.001938\) (tanβ=1) versus \(0.935846\) (tanβ=10) at M=500 GeV. The wavefunction factor cancels from this fixed-state LO ratio.
 
 **Caution:** The published Eq. (A.7) already contains the two squared terms whose transverse/longitudinal identification we established with an independent tensor contraction. The new plot and the polarization mapping alone are *probably insufficient* as a distinct phenomenology paper. The pre-erratum splitting used in earlier literature cannot be reused as unconstrained free physics.
 
@@ -36,3 +36,8 @@ A severe referee objection is: 'You have only plotted a helicity decomposition t
 ## Joint-angle result (new within this pilot)
 
 An on-shell narrow-width W+Z three-angle density was constructed from the LO scalar helicity amplitudes and leptonic W/Z decay currents, including transverse–longitudinal interference. Analytic polar-angle-integrated coefficients \(a_1,a_2\) were derived and tested by independent numeric quadrature; \(a_1\) changes sign across erratum-restricted tanβ. In particular, at M=500 GeV, \(a_1=-0.120305\) for tanβ=3, compared with \(+0.091375\) for tanβ=0.1. Unlike integrated rates, \(a_1\) retains relative helicity sign information. **This remains a conditional pilot result, not a demonstrated novel EPJC contribution.** Prior analytic amplitudes in the 2023 Forsyth thesis and possible already published angular methods remain an explicit referee risk. Detector-level viability and the exact full INSPIRE graph remain unknown.
+
+
+## Independent generator countercheck — MUST RESOLVE
+
+On 2026-11-07, user-run MG5_aMC 3.5.1 MSSM_SLHA2 matrix2py returned numerical, color-averaged matrix elements at M=500 GeV, tanbeta=3: WZ = 142350088.3299091 and Wgamma = 772.9807959512825. Both differ sharply from the assumed color-averaged analytic prediction (0.005317520079460985 and 0.001680692474251963), by factors 2.677e10 and 4.599e5 respectively. The numerical benchmark **FAILS**, but whether the problem is momentum indexing/phase space, MSSM model inputs/diagrams, or the analytic amplitudes remains UNKNOWN. The Python/Mathematica internal validation does NOT supersede these independent results. Pause physical interpretation, headline plots and publication claims; use the read-only MG5 discrepancy audit to identify the cause. Original code and parameter cards are preserved.
