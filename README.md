@@ -128,3 +128,18 @@ Use MadGraph's documented make matrix2py.so API instead. At M=500 GeV, tanβ=3:
 Each generated process is run in its own Python process (matrix2py shares the same extension module name). Review cards are loaded by initialisemodel; the default param_card.dat is not overwritten. NumPy with f2py, GNU Fortran and a C compiler are required. Both raw matrix elements, the assumed /3 color-normalized analytic targets, ratios and input reader evidence are written to threshold_benchmarks/*/matrix2py_result.json.
 
 Do **not** run the old --apply or mg5_evaluate_threshold.py path. The new program saves a diagnostic comparison, not a publication-grade validation without independently checking generated color and mixing conventions.
+
+
+### Isolated fix for MG5 3.5.1 f2py3.10 loader (2026-11-07)
+
+The first WZ matrix2py build failed before Fortran compilation: the generated standalone Makefile invokes stale /usr/bin/f2py3.10 (NumPy 1.21.5 console-entrypoint), while the active interpreter has NumPy 2.2.6. This is a toolchain issue, not an amplitude mismatch.
+
+Recommended isolated and reversible fix:
+
+    python3.10 -m venv .venv-mg5-f2py
+    .venv-mg5-f2py/bin/python -m pip install -r requirements-mg5-f2py.txt
+    .venv-mg5-f2py/bin/python scripts/fix_mg5_f2py_makefile.py --apply
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    .venv-mg5-f2py/bin/python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+Only generated standalone P*/makefile files are changed, and backups are preserved. The MG5 installation, original cards and all physics sources remain unchanged. Run the f2py extension with the SAME venv Python used for compilation; a NumPy1.x-built module cannot safely be imported into the active NumPy2.x interpreter. See madgraph/README.md.
