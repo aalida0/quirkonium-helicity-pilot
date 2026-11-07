@@ -1,0 +1,10 @@
+# Control: left-handed MSSM squarks have the same SM electroweak gauge vertices
+# as the scalar doublet squirks, but carry QCD color instead of infracolor.
+# This is a fixed-color matrix-element control, NOT a bound-state prediction.
+set gauge unitary
+import model mssm
+generate ul dl~ > w+ z QCD=0 QED=2
+output standalone MG5_UL_DL_WZ -f
+import model mssm
+generate ul dl~ > w+ a QCD=0 QED=2
+output standalone MG5_UL_DL_WA -f
