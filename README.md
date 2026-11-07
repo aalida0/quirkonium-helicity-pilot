@@ -111,3 +111,20 @@ python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3
 ```
 
 The preflight writes `PS.input` and a JSON report. Before using its optional `--write-cards --apply` mode, check the generated MSSM model mass, gauge input and first-generation squark mixing conventions. If `check_sa.f` supports `READPS`, `scripts/mg5_evaluate_threshold.py` can compile/run a reproducible single-point check and save its raw result. No independent amplitude PASS is assigned until actual MadGraph values are inspected, including the generated initial-color denominator. See `madgraph/README.md` for full instructions and benchmark targets.
+
+
+## MG5 exact four-momentum comparison without READPS or overwriting cards
+
+The user confirmed the generated MSSM_SLHA2 Source/MODEL/param_read.inc reads aEWM1 and mdl_MW, while GF is not an external SMINPUTS entry in the produced cards. Source/internal coupling relations must still be checked. The old check_sa.f READPS gate is unavailable for this generated code.
+
+Use MadGraph's documented make matrix2py.so API instead. At M=500 GeV, tanβ=3:
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/mg5_threshold_preflight.py --mass 500 --tanbeta 3 --write-cards
+    python scripts/mg5_matrix2py_compare.py --channel Z --mass 500 --tanbeta 3
+    python scripts/mg5_matrix2py_compare.py --channel gamma --mass 500 --tanbeta 3
+
+Each generated process is run in its own Python process (matrix2py shares the same extension module name). Review cards are loaded by initialisemodel; the default param_card.dat is not overwritten. NumPy with f2py, GNU Fortran and a C compiler are required. Both raw matrix elements, the assumed /3 color-normalized analytic targets, ratios and input reader evidence are written to threshold_benchmarks/*/matrix2py_result.json.
+
+Do **not** run the old --apply or mg5_evaluate_threshold.py path. The new program saves a diagnostic comparison, not a publication-grade validation without independently checking generated color and mixing conventions.
