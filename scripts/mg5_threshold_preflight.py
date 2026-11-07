@@ -117,6 +117,10 @@ def run():
         matrix_text=mats[0].read_text(errors="replace")
         fragments=re.findall(r"\bIDEN\s*(?:\([^)]*\))?[^\n]{0,80}",
                              matrix_text,re.I)
+        graphs=re.search(r"\bPARAMETER\s*\(\s*NGRAPHS\s*=\s*(\d+)",
+                         matrix_text,re.I)
+        nc=re.search(r"\bPARAMETER\s*\(\s*NCOLOR\s*=\s*(\d+)",
+                     matrix_text,re.I)
         prior,prior_width=parse_card(card.read_text())
         gf=math.pi*ALPHA_W/(math.sqrt(2)*MW**2)
         updates={("MASS",1000002):b.mu,("MASS",1000001):b.md,
@@ -140,6 +144,8 @@ def run():
                  "check_sa_has_READPS":("READPS" in check_sa.read_text(errors="replace")
                                         if check_sa.is_file() else False),
                  "IDEN_source_fragments":fragments[:8],
+                 "NGRAPHS":int(graphs.group(1)) if graphs else None,
+                 "NCOLOR":int(nc.group(1)) if nc else None,
                  "default_MASS":{str(i):prior.get(("MASS",i))
                                  for i in (1000001,1000002,23,24)},
                  "default_SMINPUTS":{str(i):prior.get(("SMINPUTS",i))
