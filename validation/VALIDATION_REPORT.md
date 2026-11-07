@@ -120,3 +120,10 @@ The user supplied the actual WZ `matrix2py_build.log`. It invokes `/usr/bin/f2py
 This is a **local Python toolchain compatibility failure, not an amplitude disagreement**. Status: generated MG5 WZ/Wgamma process files PASS (user-run); numerical MG5 matrix-element agreement UNKNOWN (blocked before compilation). A reversible generated-Makefile patch script, isolated Python 3.10 NumPy 1.26.4 build requirement, and regression tests were committed. Neither the patched build nor matrix2py result has yet been run on the user's machine.
 
 Required run: create a project-local venv (NumPy 1.26.4, setuptools 68.2.2), patch only the generated standalone Makefiles, compile with that venv, load the matching preview card and evaluate both channels at fixed momenta. Preserve original SLHA cards, check color-average and EW mixing before interpreting a ratio.
+
+
+### Addendum: local venv symlink / generated Makefile variable fixer error (2026-11-07)
+
+The user installed isolated NumPy 1.26.4 and setuptools 68.2.2. The first fixer failed with ValueError: No f2py3.10 launcher found, printing Selected Python: /usr/bin/python3.10 and NumPy/f2py 1.26.4 2.2.6. This was caused by our incorrect use of Path(sys.executable).resolve(), which chased the virtualenv symlink to the system interpreter for the subprocess. The absent literal f2py3.10 in the generated Makefile may result from a Makefile variable expansion. It is NOT evidence that f2py is unavailable.
+
+Code now preserves sys.executable's virtualenv path, creates a venv-local f2py3.10 shim for variable-expanded launcher invocation, and prepends venv bin to PATH for make. Regression test covers the variable-based Makefile. Fixes are prepared but not yet re-executed by user. Independent MG5 numeric amplitude gate remains UNKNOWN; Mathematica comparison remains PASS at numerical precision.
