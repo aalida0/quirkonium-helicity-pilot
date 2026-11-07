@@ -103,14 +103,32 @@ def find_generated_process(base):
         raise RuntimeError(f"Generated subprocess name changed: {work.name}; "
             "inspect actual particle ordering before evaluating six-leg vectors")
     source=subs[0].read_text(errors="replace")
-    if not re.search(r"NEXTERNAL\s*=\s*6\b",source,re.I):
-        # In some MG5 versions NEXTERNAL is defined in a separate include.
-        # We do NOT use this as a proof of external ordering.
-        raise RuntimeError("Cannot verify NEXTERNAL=6 in matrix.f; inspect first")
-    if re.search(r"CALL\s+[IO]XXXXX\s*\(\s*P\(0,\s*[3-6]\)\s*,\s*MDL_M(?:E|MU)",source,re.I):
+    # Generated matrix.f often INCLUDEs nexternal.inc rather than declaring
+    # NEXTERNAL=6 literally. Verify all external HELAS wavefunctions instead.
+    external={}
+    wavefunction=re.compile(
+        r"CALL\s+([SIVOT]XXXXX)\s*\(\s*P\(0,\s*(\d+)\)\s*,\s*([^,]+)",
+        re.I)
+    for found in wavefunction.finditer(source):
+        idx=int(found.group(2))
+        mass=found.group(3).strip().upper()
+        if idx in external:
+            # Some MG5 backends have multiple subroutines; do not quietly
+            # assume a duplicated external leg is harmless.
+            if external[idx]!=mass:raise RuntimeError(
+                f"Conflicting external leg {idx} mass args: "
+                f"{external[idx]} and {mass}")
+        external[idx]=mass
+    if set(external)!=set(range(1,7)):
         raise RuntimeError(
-            "Generated external lepton wavefunctions use nonzero masses. "
-            "This pilot assumes massless W/Z leptonic daughters.")
+            f"Cannot verify all six external wavefunctions in matrix.f: {external}; "
+            "inspect actual HELAS calls before claiming a signed angle")
+    for idx in range(3,7):
+        if external[idx] not in ("ZERO","0D0","0.D0","0.0D+00"):
+            raise RuntimeError(
+                f"Outgoing lepton leg {idx} uses mass argument "
+                f"{external[idx]}, not ZERO. Current 6-leg momenta assume "
+                "massless charged leptons and neutrinos.")
     stage_ident_card(model,work)
     return model,work
 
