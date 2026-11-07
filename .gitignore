@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 *.log
 .DS_Store
+
+# INSPIRE local download caches: retain concise audited summaries in Git, not bulk API JSON
+validation/inspire_audit*/raw_api/
+validation/inspire_audit*/inspire_audit.json
+validation/local_logs/
