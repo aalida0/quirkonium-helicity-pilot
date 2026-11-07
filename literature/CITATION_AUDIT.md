@@ -44,3 +44,57 @@
 
 ### Added source locator
 The 2023 Forsyth MS thesis specifically displays charged-squirkonium WZ coefficient functions at **Eqs. (4.2.12a,b)** and the Wγ coefficient in the same discussion, with charged Wγ/WZ branching-fraction comparison in **Fig. 4.2**. Source: https://physics.byu.edu/docs/thesis/1674. Be cautious: its sign convention for the mass splitting may differ from the 2025 paper. The exact equation comparison requires fixing the Δ definition before transplanting formulae.
+
+
+## 2026-11-07 — User-run continuation results (66-test PASS)
+
+Direct Ubuntu terminal output establishes:
+
+* Python: **66 tests PASS** in 3.633 seconds.
+* Mathematical D-term two-branch gate: **7/7 masses PASS**, M=250,300,
+  400,500,800,1200,2000 GeV; for tanbeta_high=3 matched low-tanbeta
+  solutions are 0.490813616081, 0.463905016580, 0.421083863861,
+  0.394724021524, 0.359987245098, 0.345674525124, 0.337874169952.
+  Identical LO f00 and normalized two-channel BR(WZ), but opposite signed
+  a1 at each mass, IN THE SPECIFIED amplitude model. No new physics
+  parameter-space viability gate was completed.
+* Ideal azimuthal moment at M=500,tanbeta=3: a1=-0.120305, a2=0.02268.
+  Approx. 1249/3469 CLEAN selected signal events for 3/5 sigma nonzero
+  moment with full reconstruction, no backgrounds; NOT collider reach.
+* Independent MG5 summed MEs: **12/12 PASS** (WZ and Wgamma at six
+  masses/tanbeta points). Maximum absolute relative deviation
+  1.2025731282032518e-10 at WZ M=2000,tanbeta=3.
+* Independent MG5 helicity-SQUARED results at M=500,tanbeta=3:
+  WZ transverse 0.0004823977211492944 vs 0.0004823977211491437
+  analytic; longitudinal 0.004835122358313449 vs
+  0.004835122358311841 analytic.
+  f00(MG5)=0.9092814481298518 vs f00(analytic)=0.9092814481298503.
+  Wgamma all-transverse 0.0016806924742524885 vs
+  0.0016806924742519627; longitudinal and unphysical parts zero.
+  COMPLEX relative H++/H00 phase needed for signed a1 is NOT
+  checked by these squares.
+* INSPIRE first-hop script reported scalar_2008=0, fermionic_2011=4,
+  spin_bound_states_2011=406, scalar_2025=2 forward papers and
+  complete_requested_scope=True.
+
+**Critical INSPIRE integrity inconsistency:** The published 2025 Forsyth
+paper (PRD 111 115021, DOI:10.1103/34xj-vz82) explicitly cites the
+2008 Burdman paper (PRD 78 075028) as ref. 51. Thus zero forward
+citations for the 2008 seed is NOT a trustworthy complete graph.
+Whether the cause is INSPIRE curation, ID mapping or query errors is
+UNKNOWN. Previously returned complete_requested_scope=True only
+signified paginated response completion, not source corroboration.
+A new source-backed forward-edge and identifier consistency guard
+in scripts/inspire_quirkonium_citations.py flags the graph as inconsistent
+until the known edge is recovered. Run the crawler again.
+
+Validation status: analytic/summed amplitudes PASS 12 external points;
+squared helicities PASS 1 point; signed complex phase UNKNOWN;
+tanbeta<1 physical model viability UNKNOWN; full citation-network
+integrity/novelty UNKNOWN; paper readiness NOT ESTABLISHED.
+
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+    python scripts/inspire_quirkonium_citations.py --depth 1
+
+No changes to the original matrices, model sources or original cards.
