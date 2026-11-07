@@ -6,12 +6,14 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch, Mock
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 sys.path.insert(0,str(ROOT/"src"))
-from mg5_matrix2py_compare import prepare,external_input_audit,build_error_summary
+from mg5_matrix2py_compare import (prepare,external_input_audit,
+    build_error_summary,stage_ident_card,evaluate_in_worker)
 from scalar_threshold_amplitudes import ALPHA_W,S2,MW,MZ,splitting
 
 class MG5Matrix2PyPreflight(unittest.TestCase):
@@ -49,6 +51,58 @@ class MG5Matrix2PyPreflight(unittest.TestCase):
                 "      CALL LHA_GET_REAL(NPARA,PARAM,VALUE,'aEWM1',AEWM1,1.279340D+02)\n"
                 "      CALL LHA_GET_REAL(NPARA,PARAM,VALUE,'mdl_MW',MDL_MW,7.982901D+01)\n")
         return base
+
+    def test_ident_card_source_linked_to_generated_subprocess(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/"MG5_UL_DL_WZ"
+            source=root/"Source"/"MODEL"
+            work=root/"SubProcesses"/"P1_sample"
+            source.mkdir(parents=True)
+            work.mkdir(parents=True)
+            (source/"ident_card.dat").write_text("aEWM1 SMINPUTS 1\n")
+            report=stage_ident_card(root,work)
+            self.assertTrue(report["found"])
+            self.assertTrue(report["staged"])
+            self.assertEqual((work/"ident_card.dat").read_text(),
+                             "aEWM1 SMINPUTS 1\n")
+            self.assertTrue((work/"ident_card.dat").is_symlink())
+            second=stage_ident_card(root,work)
+            self.assertFalse(second["staged"])
+
+    def test_refuse_missing_ident_card_instead_of_fabricating(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/"MG5_UL_DL_WZ"
+            work=root/"SubProcesses"/"P1_sample"
+            work.mkdir(parents=True)
+            with self.assertRaisesRegex(RuntimeError,
+                                        "Existing ident_card.dat not found"):
+                stage_ident_card(root,work)
+            self.assertFalse((work/"ident_card.dat").exists())
+
+    def test_silent_fortran_stop_does_not_count_as_me_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            work=root/"P1_sample"
+            work.mkdir()
+            card=root/"param_card.dat"
+            card.write_text("BLOCK MASS\n")
+            logdir=root/"logs"
+            logdir.mkdir()
+            ps=[[250.,0.,0.,0.],[250.,0.,0.,0.],
+                [250.,0.,0.,1.],[250.,0.,0.,-1.]]
+            # Simulate a Fortran STOP with return code zero and a warning
+            # printed instead of a structured result file.
+            fake=Mock(returncode=0,
+                      stdout="Warning: file ident_card.dat not found\n",
+                      stderr="")
+            with patch("mg5_matrix2py_compare.subprocess.run",
+                       return_value=fake):
+                with self.assertRaisesRegex(RuntimeError,
+                                            "did not return a numerical"):
+                    evaluate_in_worker(work,card,ps,.118,logdir)
+            self.assertIn("ident_card.dat not found",
+                          (logdir/"matrix2py_initialization.log").read_text())
+            self.assertFalse((logdir/"matrix2py_worker_result.json").exists())
 
     def test_build_error_summary_keeps_compiler_diagnostic(self):
         log=("gfortran -c matrix.f\n"
