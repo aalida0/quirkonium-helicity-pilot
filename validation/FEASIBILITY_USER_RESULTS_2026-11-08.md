@@ -137,3 +137,66 @@ additional genuinely distinct results.
 - Phys. Rev. D 111, 115021 (2025), https://doi.org/10.1103/34xj-vz82
 - 2026 erratum https://doi.org/10.1103/lwnc-cmpn
 - feasibility protocol validation/FEASIBILITY_STOP_GATES_2026-11-08.md
+
+
+## Follow-up: user-run same-ensemble angular refinement (2026-11-08)
+
+User fixed orientations=5 and rapidities=[-1,0,1], increased
+polar Gauss-Legendre nodes 5 -> 8, Phi samples 12 -> 16.
+Saved under validation/local_logs/neutrino_pz_fixed_kinematics_fine.json.
+
+| Observable | 5x12 coarse same ensemble | 8x16 fine same ensemble |
+|---|---:|---:|
+| a1 low/high true | +/-0.1210891 | +/-0.1205134 |
+| a1 low min-abs-pz | +0.0494202 | +0.0454307 |
+| a1 high min-abs-pz | -0.0485950 | -0.0446683 |
+| min-abs-pz Delta a1 | +0.098015 | +0.090099 |
+| min-abs-pz correct pz root fraction | 0.663 | 0.645 |
+| min-abs-pz N clean selected for 3 sigma | 1892 | 2239 |
+| min-abs-pz min effective sigma production, eps=1 | 57.61 fb | 68.17 fb |
+| equal-root average N clean 3 sigma | 32923 | 43787 |
+| equal-root min sigma production, eps=1 | 1002.46 fb | 1333.25 fb |
+
+The refined same-ensemble study still reports
+TOY_OPPOSITE_SIGNS_RETAINED. The high/low sign reversal
+survives at the selected reconstruction prescription.
+However Delta a1 changes ~8.1 percent, causing an 18.3 percent
+increase in signal-only moment count. Thus the numerical
+estimate is **not yet converged**: test 12 polar nodes and
+24 Phi at the *same* rapidities and orientations.
+
+At M500 and L=3000 fb-1, the new fixed-ensemble 3sigma
+minimal production requirement 68.17 fb at perfect efficiency
+becomes 227.2 fb at epsilon=0.3 and 681.7 fb at epsilon=0.1,
+still BEFORE any irreducible SM WZ background or detector
+smearing. This is a selected-signal moment-estimator
+diagnostic only, not a collider sensitivity result.
+
+For a different 7-orientation/5-rapidity ensemble, prior
+8x16 result 77.83 fb cannot be interpreted as an
+angular-convergence change.
+
+### Production caution from original source
+
+Forsyth et al PRD 111 (2025) 115021, Appendix A.2,
+provides the charged scalar pair-production parton-level
+cross section via s-channel W*. Sec. 4.1.1 Eq. (3.6)
+applies bound-state deexcitation probability versus heavy
+constituent beta-decay, reducing charged resonance yield.
+The April 2026 erratum corrected Fig.5(b) to multiply the
+WZ production curves by SEMILEPTONIC branching fractions,
+not the fully leptonic 3lnu BR needed here.
+
+Thus actual sigma(pp->charged pair) and the deexcited
+charged survival probability have NOT been evaluated by
+this pilot; production vs the necessary >68.17 fb is
+UNKNOWN. Do not use the MSSM_SLHA2 strong-QCD squark pair
+production as a proxy: the target squirks are SM-color
+singlets, and only their hidden infracolor SU(3) multiplicity
+matches the 3-state bookkeeping. The existing MG5
+MSSM_SLHA2 WZ annihilation calculation does not give
+the hadronic charged pair production cross section.
+
+The old test failure from 3-point Gauss-Legendre quadrature
+was fixed with a strict 3->5 point convergence assertion,
+but no user-run post-fix test result has yet been received.
