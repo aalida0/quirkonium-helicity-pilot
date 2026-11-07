@@ -75,3 +75,20 @@ Generate the MadGraph standalone *EW control* from the repository root:
 **Important:** successful MG process generation does not demonstrate the amplitude is correct. A fixed-color, fixed-helicity matrix-element benchmark, parameter card and threshold extrapolation must be compared numerically and logged before the MG gate can be PASS. Never equate QCD-colored MSSM squarks with infracolor squirks for production.
 
 The user executed the original Mathematica tensor/width/Ward script on 2026-11-07: it printed PASS but also `N::meprec` precision warnings. Nine `f00,a1,a2` rows were independently compared against the Python implementation (largest absolute deviation `1.82e-14`). This establishes a **scoped numerical Mathematica/Python comparison**, not a clean 1e-22 precision certification or an independent MG5 generator check. The original comparator crashed because it tried importing `polarization_fraction` rather than the actual `f00` API; fixed, with Mathematica precision-suffix handling and a regression fixture. The revised 60-digit Wolfram script still needs a clean rerun. MG5 and live INSPIRE runs remain UNKNOWN. Running `python -m unittest discover -s tests -v` now also checks the stored nine-point Mathematica fixture.
+
+## MadGraph 3.5.1 compatibility fix
+
+The user's first MG5 run failed solely during `import model mssm`, which was replaced by `MSSM_SLHA2` in this installation. The corrected card uses `import model MSSM_SLHA2` and retains `ul dl~ > w+ z/a QCD=0 QED=2`.
+
+```bash
+git pull --ff-only origin research/pilot1-literature-model-gate
+mkdir -p validation/local_logs
+(
+  cd validation/local_logs
+  set -o pipefail
+  "$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC" ../../madgraph/mssm_ew_procs.mg5 2>&1 | tee madgraph_generation.log
+)
+python scripts/check_mg5_generation.py validation/local_logs/madgraph_generation.log
+```
+
+Do not mistake the script returning to a shell for generation success: the checker verifies both standalone matrix outputs and the absence of MadGraph error markers. Passing this check is **generation only**, not a matrix-element physics validation.
