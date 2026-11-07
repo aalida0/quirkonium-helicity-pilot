@@ -70,3 +70,9 @@ I independently parsed the **nine** WZ benchmark rows from this supplied log and
 The original `scripts/compare_wolfram.py` failed immediately due to an incorrect Python API import (`polarization_fraction` should be `f00`) and, independently, did not support Mathematica arbitrary-precision suffixes (`0.123`16.`). Both are corrected and regression tests added. The Mathematica script now uses 60-digit floating EW inputs and cached exact Wigner-d polar integrals to prevent the enormous exact-radical expressions, but **that corrected Wolfram script remains unexecuted**.
 
 **Updated gate:** Mathematica–Python benchmark comparison **PASS at double-precision numerical level, user-run evidence**. Clean high-precision Wolfram arithmetic **UNKNOWN**, pending rerun. MadGraph independent diagram generation/matrix-element comparison **UNKNOWN**, awaiting user machine. No claim of full-model physical viability or novel publication.
+
+### Addendum — independent MG5 control blocked at model import (2026-11-07)
+
+The user executed the initial standalone MadGraph card using **MG5_aMC 3.5.1** at `$HOME/codes/Herwig/herwigpp/opt/MG5_aMC_v3_5_1/bin/mg5_aMC`. The executable started, but `import model mssm` returned **ERROR**: model replaced by `MSSM_SLHA2`. MadGraph skipped all subsequent `generate` and `output` commands. This is an **execution/configuration failure**, not evidence against the physical amplitudes. No MG matrix elements have been independently produced.
+
+The model card was updated to `import model MSSM_SLHA2` with the same `ul dl~ > w+ z` and `ul dl~ > w+ a` processes, and a postflight script now explicitly rejects any logged MG error or missing Fortran `matrix.f` output, independent of the MadGraph process exit code. **MG gate remains UNKNOWN pending actual successful generation AND threshold fixed-color ME comparison.** Warnings for FastJet, LHAPDF, Ninja, Collier were nonfatal initialization warnings and unrelated to the model-import failure.
