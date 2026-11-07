@@ -442,3 +442,44 @@ ensembles must be compared.
 The user's 69-test and independent spin-correlated six-leg MG5
 validation PASS remain. The new feasibility scripts and new regression
 tests are COMMITTED but NOT YET RUN on the user's workstation.
+
+
+### 2026-11-08: user-run feasibility evidence and corrected convergence regression
+
+The 81-test run had 80 passes and **one failure due to coarse
+angular integration**: three Gauss–Legendre polar nodes and eight
+Phi angles yield a1=0.1235155400 vs the analytic closed
+0.1203051105, absolute error 0.00321043 > the old .003 tolerance.
+A denser user-run 5-node/12-Phi result gave 0.1210891 and the
+8-node/16-Phi result 0.1205134. This is **numerical quadrature
+accuracy**, not a physics-amplitude failure. The test now requires
+explicit 3-to-5 node error improvement and a .0015 absolute
+fine-grid tolerance, rather than simply loosening the original
+tolerance. Local retest is PENDING.
+
+The user-run model-domain gate PASS is limited to the common
+first-generation scalar SU(2)L doublet D-term mass relation at
+M250/500/1000/2000 GeV. For M500 the low branch has an assumed
+weak-scale type-II y_t=2.5499 and unequal absolute partial
+widths relative to the high branch (WZ low/high=0.789 for equal
+wavefunction normalization). UV consistency is UNKNOWN.
+
+The exact-MET neutrino-pz toy kept a1 signs opposite, but with
+substantial dilution for the min-|pz| algorithm. Refined toy:
+low a1=+.0425996, high=-.0417345 (truth ±.1205134);
+3sigma simple moment required selected trileptons=2556,
+requiring effective sigma_prod>77.83 fb at L=3000/fb
+with 100% acceptance, >778.3 fb if epsilon=10%.
+The equal-root average requires 27414 selected signal events,
+>834.72 fb at epsilon=1. No background, detector, realistic
+pp rapidity distribution or UV viability is modeled. The
+coarse and refined tests changed angular integration AND boost
+ensembles simultaneously, therefore a convergence claim is
+not justified.
+
+**Paper decision:** NO-GO for just the a1 sign flip or an
+HL-LHC trilepton discovery statement. Next scientifically
+valuable gate is source-matched sigma(pp→Psi±) and a bounded
+model/perturbativity check for tanbeta≈0.395. Do not extend
+amplitude infrastructure further. Full numerical results:
+validation/FEASIBILITY_USER_RESULTS_2026-11-08.md.
