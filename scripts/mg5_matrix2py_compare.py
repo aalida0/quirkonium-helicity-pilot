@@ -51,7 +51,7 @@ def prepare(channel,mass,tb,base):
         raise RuntimeError(f"Expected exactly 1 matrix.f for {name}; found {len(sub)}")
     work=sub[0].parent
     default=directory/"Cards/param_card.dat"
-    review=directory/"Cards/param_card_quirkonium_review.dat"
+    review=directory/"Cards/param_card_quirkonium_review_compact.dat"
     if not default.is_file() or not review.is_file():
         raise RuntimeError("Missing standalone original/review cards. Run "
           f"python scripts/mg5_threshold_preflight.py --mass {mass:g} "
@@ -66,6 +66,16 @@ def prepare(channel,mass,tb,base):
         have=matched.get(key)
         if have is None or not math.isclose(have,val,rel_tol=1e-10,abs_tol=1e-9):
             raise RuntimeError(f"Review card mismatches {key}: expected {val}, got {have}")
+    # A legacy fixed-width SLHA reader may silently truncate 21-character
+    # scientific notation fields. Reject unsafe preview fields up front.
+    import re as _re
+    for line in review.read_text().splitlines():
+        data=line.split("#",1)[0].strip()
+        fields=data.split()
+        if len(fields)>=2 and _re.fullmatch(
+            r"[-+]?\d+\.\d+[EeDd][-+]?\d+",fields[1]
+        ) and len(fields[1])>20:
+            raise RuntimeError(f"Unsafe wide numeric field in compact review: {fields[1]}")
     if ("SMINPUTS",2) in matched and ("SMINPUTS",2) not in prior:
         raise RuntimeError("Review card injected unregistered GF into MSSM model")
     ps=momenta(b)
