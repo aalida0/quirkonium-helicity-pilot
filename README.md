@@ -45,3 +45,33 @@ No direct complete two-hop INSPIRE citation graph (API unavailable, scholarly co
 ## Additional joint-decay calculation
 
 The on-shell WZ helicity amplitudes have now been propagated through the SM W and Z chiral leptonic currents. See theory/joint_angular_interference.md and src/joint_wz_angles.py. The normalized decay-plane azimuth density is \((1+a_1\cos\Phi+a_2\cos2\Phi)/(2\pi)\). The \(a_1\) term retains the sign of transverse–longitudinal interference and is not reconstructible from helicity-summed **rate values alone**. At M=500 GeV and tanβ=0.1,1,3,10, \(a_1=(+0.091375,-0.018423,-0.120305,-0.102636)\). The calculation, its positivity, normalization and two harmonics are covered by five additional tests in tests/test_joint_wz_angles.py, and plotted with src/make_joint_figures.py. Total local test count is **14** (9 threshold + 5 joint-angle). This is an *idealized theoretical* angular result; paper novelty and detector observability remain unverified.
+
+
+## Independent Wolfram/MG5 and INSPIRE phase (2026-11-07)
+
+The research branch now contains **prepared, not yet executed** cross-validation tools:
+
+- `mathematica/validate_scalar_WZ.wl`: independent rank-two tree tensor with Wγ photon Ward tests, source WZ/Wγ width comparisons and Wigner-d angular Fourier moments.
+- `madgraph/mssm_ew_procs.mg5`: two standalone processes for a pure-left up/down MSSM squark EW control (not the full hidden-color squirk model).
+- `scripts/inspire_twohop.py`: live INSPIRE canonical DOI/arXiv seed resolver with paginated first-hop and relevance-selected second-hop citation graph, error logging and raw JSON caching.
+- `scripts/compare_wolfram.py` and `scripts/run_local_checks.sh`: run and compare independent numerical benchmarks.
+- `validation/INDEPENDENT_VALIDATION_GATE.md`: detailed acceptance criteria and version/card/evidence requirements.
+
+Run on a machine with Mathematica (from the repository root):
+
+    mkdir -p validation/local_logs
+    wolframscript -file mathematica/validate_scalar_WZ.wl | tee validation/local_logs/mathematica.log
+    python scripts/compare_wolfram.py validation/local_logs/mathematica.log
+
+Run the INSPIRE graph retrieval (Internet required):
+
+    python scripts/inspire_twohop.py --output validation/inspire_audit
+
+Generate the MadGraph standalone *EW control* from the repository root:
+
+    export MG5_BIN=/absolute/path/to/MG5_aMC/bin/mg5_aMC
+    ( cd validation/local_logs && "$MG5_BIN" ../../madgraph/mssm_ew_procs.mg5 ) |& tee validation/local_logs/madgraph_generation.log
+
+**Important:** successful MG process generation does not demonstrate the amplitude is correct. A fixed-color, fixed-helicity matrix-element benchmark, parameter card and threshold extrapolation must be compared numerically and logged before the MG gate can be PASS. Never equate QCD-colored MSSM squarks with infracolor squirks for production.
+
+Existing Python tests were rerun locally: 14 PASS. New scripts passed Python syntax/offline logic checks, but no Wolfram/MG5 executable or live INSPIRE API access was available here. Hence the three independent gates remain UNKNOWN.
