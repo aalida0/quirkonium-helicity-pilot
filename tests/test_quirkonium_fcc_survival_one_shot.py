@@ -98,8 +98,14 @@ class PDFSurvivalTests(unittest.TestCase):
 
     def test_tiny_full_one_shot_workflow_and_json(self):
         p=UniformXF()
-        data=run_scenario(p,13.6,3000.,500.,3.,
-                          [2.,5.],12,20,28,3,8,3,"ud")
+        # The fixture sets x*f=1 for every parton: it is NOT a real
+        # 13.6 TeV PDF or a physical cross-section prediction.
+        # Suppress its verbose user-facing collider summary.
+        import io
+        from contextlib import redirect_stdout
+        with redirect_stdout(io.StringIO()):
+            data=run_scenario(p,13.6,3000.,500.,3.,
+                              [2.,5.],12,20,28,3,8,3,"ud")
         self.assertEqual(data["angular_charge_mode"],"W+ only")
         self.assertEqual(
             data["source_beta_width_eqA1_vs_rough_eq3_5"],
