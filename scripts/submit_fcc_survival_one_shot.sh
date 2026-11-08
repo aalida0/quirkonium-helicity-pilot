@@ -5,10 +5,11 @@
 
 set -Eeuo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="/data/${USER}/quirkonium-production/fcc_survival_one_shot_20261108"
-mkdir -p "$RUN_DIR"
+JOB_DIR="${HOME}/quirkonium-helicity-pilot/condor/fcc_survival_one_shot_20261108"
+OUTPUT_DIR="/data/${USER}/quirkonium-production/fcc_survival_one_shot_20261108"
+mkdir -p "$JOB_DIR" "$OUTPUT_DIR"
 
-WORKER="$RUN_DIR/worker.sh"
+WORKER="$JOB_DIR/worker.sh"
 cat >"$WORKER" <<EOF
 #!/usr/bin/env bash
 set -Eeuo pipefail
@@ -32,13 +33,13 @@ python scripts/quirkonium_fcc_survival_one_shot.py \\
   --reference-nodes 72 \\
   --polar-nodes 8 --phis 16 --orientations 5 \\
   --flavor-mode full-ckm \\
-  --output "$RUN_DIR/fcc_survival_all.json"
+  --output "$OUTPUT_DIR/fcc_survival_all.json"
 EOF
 chmod 750 "$WORKER"
 
 if [[ "${1:-}" == "--local" ]]; then
   echo "RUNNING LOCALLY (avoid on a busy shared login node)"
-  bash "$WORKER" 2>&1 | tee "$RUN_DIR/local.log"
+  bash "$WORKER" 2>&1 | tee "$JOB_DIR/local.log"
   exit "${PIPESTATUS[0]}"
 fi
 
@@ -48,13 +49,14 @@ if ! command -v condor_submit >/dev/null 2>&1; then
   exit 3
 fi
 
-SUBMIT="$RUN_DIR/submit.sub"
+SUBMIT="$JOB_DIR/submit.sub"
 cat >"$SUBMIT" <<EOF
 universe = vanilla
 executable = $WORKER
-output = $RUN_DIR/stdout.\$(ClusterId).\$(ProcId).log
-error = $RUN_DIR/stderr.\$(ClusterId).\$(ProcId).log
-log = $RUN_DIR/condor-events.log
+initialdir = $JOB_DIR
+output = $JOB_DIR/stdout.\$(ClusterId).\$(ProcId).log
+error = $JOB_DIR/stderr.\$(ClusterId).\$(ProcId).log
+log = $JOB_DIR/condor-events.log
 request_cpus = 1
 request_memory = 4GB
 request_disk = 2GB
@@ -63,12 +65,14 @@ getenv = False
 queue 1
 EOF
 echo "REPOSITORY=$REPO"
-echo "RUN_DIR=$RUN_DIR"
+echo "JOB_DIR=$JOB_DIR"
+echo "OUTPUT_DIR=$OUTPUT_DIR"
 echo "SUBMITTING ONE CONDOR WORKER JOB"
-condor_submit "$SUBMIT"
+(cd "$JOB_DIR" && condor_submit submit.sub)
 echo
 echo "After completion:"
-echo "  $RUN_DIR/fcc_survival_all.md"
-echo "  $RUN_DIR/fcc_survival_all.json"
-echo "  $RUN_DIR/stdout.<cluster>.<proc>.log"
+echo "  $OUTPUT_DIR/fcc_survival_all.md"
+echo "  $OUTPUT_DIR/fcc_survival_all.json"
+echo "  $JOB_DIR/stdout.<cluster>.<proc>.log"
 echo "Inspect your user-owned Condor jobs with: condor_q $USER"
+echo "If submission still fails, run: condor_submit -debug $SUBMIT"
