@@ -670,3 +670,40 @@ tests/test_quirkonium_fcc_survival_one_shot.py
 **Implementation committed, but the new survival job has NOT
 yet been run on UChicago AF, so no numerical survival outcome
 is asserted here.**
+
+
+### 2026-11-08: Local HOME-only FCC survival execution (no Condor)
+
+The user preferred local execution after a Condor worker run returned
+a FAILED (exit code 1) report. Its root cause is **not known** from
+the generic failure report alone.
+
+Run this *one shell command* on UChicago AF after checking whether
+the facility permits this workload on the login node:
+
+    cd ~/quirkonium-helicity-pilot && git pull --ff-only origin research/pilot1-literature-model-gate && bash scripts/run_fcc_survival_local.sh
+
+The runner does not invoke condor_submit/condor_q, uses Key4HEP and
+LHAPDF via CVMFS, runs the whole unittest suite first, then executes
+the full photon-cooling/survival/angles benchmark (85/100 TeV,
+LambdaPrime 1/2/3/5/10) from the HOME checkout, with single-thread
+BLAS and reduced nice priority. It writes all artifacts to HOME:
+
+    ~/quirkonium-helicity-pilot/results/fcc_survival_one_shot_20261108/fcc_survival_all.json
+    ~/quirkonium-helicity-pilot/results/fcc_survival_one_shot_20261108/fcc_survival_all.md
+    ~/quirkonium-helicity-pilot/results/fcc_survival_one_shot_20261108/local.log
+
+On Python/unit-test failure, the runner prints the underlying
+traceback and saves a clearly marked FAILED report instead of
+silently claiming success; report failure with the last ~60 lines
+of local.log. The previous Condor source archive and logs
+are not modified.
+
+**Do not run a substantial numerical job on a shared login
+node if UChicago AF usage policy disallows it.** If that
+restriction applies, use an authorized interactive compute
+allocation; the shell runner itself still needs NO Condor.
+
+The source beta lifetime discrepancy and all previously documented
+scientific unknowns persist; a completed local run is not a
+paper-sensitivity validation.
