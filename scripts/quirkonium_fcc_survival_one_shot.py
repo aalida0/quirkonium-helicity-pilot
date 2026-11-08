@@ -105,9 +105,11 @@ def survival(et,mass,delta,lam,tau_beta):
 def numerical_selfchecks():
     """Independent physical identities, no LHAPDF required."""
     import numpy as np
-    # A1 text explicitly states the normalized integral ->2/5.
+    # A1 integral ->2/5 when BOTH delta/M and Delta/mW vanish.
+    # Holding Delta=10 GeV while M->infinity leaves a finite
+    # W-propagator correction and does NOT approach the claimed 2/5.
     for n in (64,96):
-        b=beta_decay_width_A1(1e7,10.,n)
+        b=beta_decay_width_A1(1e7,.01,n)
         if abs(b["dimensionless_A1_integral"]-.4)>.00005:
             raise AssertionError("A1 small-delta integral does not approach 2/5")
     # Cross section is even in mass splitting, cooling and lifetime too.
