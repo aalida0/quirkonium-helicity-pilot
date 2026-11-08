@@ -493,3 +493,27 @@ Details: validation/FCC_PDF_WEIGHTED_USER_RESULTS_2026-11-08.md
 
 **Paper verdict unchanged: NO GO for manuscript now; conditional
 GO for the small FCC-hh no-detector feasibility pilot only.**
+
+
+## 2026-11-08 FCC-hh controlled angular grid refinement USER RUN
+
+PDF integration unchanged: MSTW2008lo68cl/CKM, 24 rapidity,
+40 log-shat, independent triangular 72 nodes. Orientation=5,
+W+ only. Polar/Phi angular integration refined 5x12 ->8x16.
+User-reported:
+85 TeV/20 ab^-1 reconstructed low/high a1 =
++0.027294/-0.026197 (signed diff +0.053490);
+3sigma Nselected=6356; required Psurvival*efficiency=0.051641.
+100 TeV/30 ab^-1 reconstructed low/high a1 =
++0.027493/-0.026392 (signed diff +0.053885);
+3sigma Nselected=6263; required Psurvival*efficiency=0.027580.
+Both truth a1 +/-0.120513. Independent PDF rate closure
+0.002%/0.003%. The previous 5x12 Nselected values
+5703/6761 change +11.4%/-7.4% respectively.
+
+**STATUS:** sign retained at both angular grids, but numerical
+moment and event-count convergence NOT ESTABLISHED. Do not
+promote these toy requirements to FCC reach. Next do fixed
+8x16 angles, 5 orientation nodes, vary PDF y/shat quadrature
+24/40 ->40/64; then refine angular grid at fixed PDF nodes.
+See validation/FCC_PDF_WEIGHTED_USER_RESULTS_2026-11-08.md.
