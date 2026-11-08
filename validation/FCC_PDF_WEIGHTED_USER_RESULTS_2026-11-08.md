@@ -224,3 +224,58 @@ or publication GO. No actual deexcitation survival/ISR/recoil,
 SM WZ background, lepton fiducial cuts, low-tanbeta
 UV viability, W- angular CP convention, or an independent
 infracolor color-normalization reproduction exists.
+
+
+## Follow-up 85 TeV fixed-PDF angular integration 12x24 (user-run)
+
+At 85 TeV, 20 ab^-1, M500, full-CKM MSTW2008lo68cl
+member 0, W+ only, polar/phi angular nodes 12/24,
+W orientation nodes 5, PDF rapidity/log-shat nodes 40/64,
+independent reference 72, user-run output:
+  /data/aalida/quirkonium-production/fcc85_ang12x24_pdf40x64.json
+
+| Observable | angular 8x16, same 40x64 PDF | angular 12x24, same 40x64 PDF |
+|---|---:|---:|
+| W+ pair production low branch (fb) | 562.16 | 562.16 |
+| charge-summed pair production low branch (fb) | 951.86 | 951.86 |
+| independent PDF rate check | 0.002% | 0.002% |
+| truth a1 low / high | +/-0.120513 | +/-0.120370 |
+| min-|pz| reconstructed a1, low | +0.028303 | **+0.026504** |
+| min-|pz| reconstructed a1, high | -0.027177 | **-0.025360** |
+| signed reconstructed delta a1 | +0.055480 | **+0.051864** |
+| selected clean 3sigma signal events | 5908 | **6762** |
+| minimum Psurvival * epsilon | 0.048002 | **0.054940** |
+| correct min-|pz| neutrino root | 0.579 | 0.579 |
+| known-M optimistic truth-root Nselected | 312 | 312 |
+| equal-root average Nselected | 43787 | 46123 |
+
+The angular-order change reduces signed delta a1 by ~6.52% and
+increases the selected-signal requirement by ~14.45%.
+Thus the source-integrated PDF rate and sign preservation are
+solid within the tested scope, but the reconstructed harmonic
+and moment-count numerical *convergence are not established*.
+A non-monotonic root-switching map can require higher-order
+integration or a separate MC cross-check. Do not claim stable
+dilution, FCC discovery significance, or a physical surviving
+bound-state yield.
+
+At illustrative epsilon=0.1 (excluding survival), require
+P_survival >=0.5494; at epsilon=0.3 require >=0.1831;
+both idealized background-free and without real fiducial cuts.
+
+### Decision to prioritize physics over endless quadrature
+
+Pause a broad angular grid sweep. It is more informative to
+implement the actual infracolor state deexcitation and charged
+beta-decay survival probability across the LO production
+kinematics (source-matched Forsyth 2025 equations, explicit
+glueball/infracolor inputs). Check at least one independent
+numerical integration method for final angular results before
+publication. Investigate physical low-tanbeta viability and
+hidden-color production normalization in parallel. Until those
+are checked, **paper readiness remains NO-GO**.
+
+The quirk-specific microscopic string dynamics, final charged
+bound-state formation/survival, ISR and glueball recoil were
+not simulated anywhere in these PDF+angular workflows. The
+positive production-only gate is not evidence they are negligible.
