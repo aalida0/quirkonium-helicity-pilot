@@ -344,6 +344,10 @@ def run_scenario(pdf,tev,lumi,mass,t_high,lambdas,ny,nu,refnodes,
                 continue
             n3=sign_cost(momlo,momhi,lab,3)
             n5=sign_cost(momlo,momhi,lab,5)
+            if not (math.isfinite(n3) and math.isfinite(n5)):
+                outcomes[lab]={"status":"ZERO_INTERFERENCE_CONTRAST",
+                               "necessary_no_background_3sigma_epsilon1":False}
+                continue
             sigL=lo["survival_rate"]["surv_wplus_fb"]
             sigH=hi["survival_rate"]["surv_wplus_fb"]
             possible_L=lumi*BR3*sigL
