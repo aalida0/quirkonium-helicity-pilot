@@ -442,3 +442,54 @@ charged-state survival versus beta decay, W- CP analysis,
 realistic SM WZ backgrounds and fiducial acceptance.
 Current paper verdict remains NO-GO; new narrowly scoped
 FCC PDF-reconstruction feasibility gate is GO to test.
+
+
+## 2026-11-08: user-run FCC PDF-weighted initial-pair rapidity pilot
+
+UChicago AF Key4HEP LHAPDF6.5.5, MSTW2008lo68cl member 0.
+5 polar/12 azimuth nodes, 5 W-orientation nodes, 24 y nodes,
+40 ln-shat nodes, 72-node independent triangular x1,x2
+production reference. FULL CKM production but W+ only for
+signed angle, as W- CP-conjugate angle not yet validated.
+
+85 TeV / 20 ab^-1:
+  W+ raw sigma=562.17 fb (low), 562.14 fb (high);
+  W+/W- charge sum=951.87 fb, independent integral
+  closure 0.002%;
+  truth low/high a1=+0.121089/-0.121089;
+  min-|pz| low/high a1=+0.028833/-0.027639,
+  signed contrast=+0.056472;
+  3sigma signal-only moment needs N=5703,
+  necessary P_survival*eps=0.046336 at the stated luminosity.
+
+100 TeV / 30 ab^-1:
+  W+ raw sigma=691.48 fb (low), 691.45 fb (high);
+  W+/W- charge sum=1179.6 fb, independent integral
+  closure 0.003%;
+  truth signed coefficient again +/-0.121089;
+  min-|pz| low/high a1=+0.026530/-0.025333,
+  contrast=+0.051863;
+  3sigma signal-only moment needs N=6761,
+  necessary P_survival*eps=0.029773.
+
+**Research interpretation:** the tested W+ smaller-|pz|
+observable retained opposite signed a1 after PDF-weighted
+initial-pair boosts and both scenarios pass a bare
+production-only necessary yield gate at Psurv=eps=1.
+This DOES NOT establish actual discovery potential: 
+angular quadrature is only 5x12 and earlier uniform-y
+tests showed slow convergence; true FCC y-dependent
+angular acceptance, real SM WZ backgrounds, source
+color normalization, charged survival, deexcitation recoil,
+W- CP conventions and low-tanbeta UV viability
+remain UNKNOWN.
+
+**Next gate:** keep PDF rapidity/shat integration FIXED and
+refine angular polar/phi to 8x16; compare reconstructed
+a1 and required clean signal count. Then isolate
+rapidity integration order separately before embarking
+on a full survival model or background study.
+Details: validation/FCC_PDF_WEIGHTED_USER_RESULTS_2026-11-08.md
+
+**Paper verdict unchanged: NO GO for manuscript now; conditional
+GO for the small FCC-hh no-detector feasibility pilot only.**
