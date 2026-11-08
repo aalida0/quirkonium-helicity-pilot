@@ -46,3 +46,55 @@ Next cheap check at AF:
 Sources:
 - Forsyth et al. arXiv:2504.02940 Appendix A.2 Eqs A.2-A.3, Sec 3.2.2 (analytic vs MadGraph agreement), Sec 3.1 beta-decay vs deexcitation, and 2026 erratum.
 - LHAPDF paper arXiv:1412.7420.
+
+
+## Second AF user-run: full-CKM flavor extension and JSON bug
+
+Environment same UChicago AF Key4HEP release, LHAPDF 6.5.5,
+MSTW2008lo68cl member 0 (LHAPDF ID 21000).
+Command differed from first run by --flavor-mode full-ckm.
+
+| sqrt(s) TeV | low branch charged-pair fb | high branch charged-pair fb | full-CKM vs ud-only low | required Psurvival*epsilon |
+| --- | ---: | ---: | ---: | ---: |
+| 13.6 | 61.777 | 61.774 | +4.39% | 1.468 |
+| 14.0 | 65.022 | 65.019 | +4.59% | 1.395 |
+
+The PDF integrals printed all four physical numbers before an
+OUTPUT-SERIALIZATION FAILURE, not an LHAPDF/convolution failure:
+  TypeError: keys must be str, int, float, bool or None, not tuple
+  at json.dumps(result, indent=2).
+Root cause: report["CKM_approx"] pointed directly to the source
+dictionary CKM with keys (up_PDG, down_PDG). Python permits tuple
+dictionary keys; JSON does not. The earlier ud-only mode serialized
+fine because it stored CKM_approx=None.
+
+Fixed by replacing the metadata dictionary with a sorted JSON-safe
+list of records:
+  {"up_pdg":..., "down_pdg":..., "abs_V_approx":..., "V_squared_approx":...}
+and adding an offline regression which exercises json.dumps and
+checks all six CKM flavor-pair records survive the round trip.
+Physics expressions, LHAPDF inputs and cross-section integrations
+were not altered by the patch. The saved full-CKM JSON did NOT
+exist from this failing user run; rerun after git pull.
+The regression suite has NOT yet been re-executed on the user's AF shell.
+
+The full-CKM rate at 14 TeV is 65.022 fb, versus 90.71 fb
+required by the particular fixed-ensemble 12x24, background-free
+simple moment estimator even at perfect survival and acceptance.
+Under that estimator Psurvival*epsilon would need to be 1.395,
+which is impossible. At 13.6 TeV the required factor is 1.468.
+**Full-CKM LO necessary yield gate: FAIL (scoped to this
+nonconverged toy estimator and unresolved source normalization).**
+
+Do not generalize this to an exclusion of all quirkonium theories or
+a proof of non-measurability:
+(1) the user toy cosPhi contrast changes with angular quadrature;
+(2) phase-space-optimized likelihoods and reconstruction may improve;
+(3) source hidden-color convention is still marked for independent audit;
+(4) production kinematics, constituent survival, spectrum consistency
+and real backgrounds are not modeled.
+
+Reviewer implication: prefer not to continue a lengthy angle or
+detector-simulation pipeline for this one observable without a
+demonstrably stronger inference strategy. The known angular
+formalism is also published prior art, limiting standalone novelty.
