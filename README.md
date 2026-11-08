@@ -605,3 +605,68 @@ This new differential workflow is COMMITTED, **NOT YET USER-RUN**.
 Check cross-section closure before interpreting any moments;
 repeat at controlled angular/rapidity integration orders to
 assess convergence.
+
+
+### 2026-11-08: ONE-COMMAND FCC-hh quirk survival/deexcitation work package
+
+The source-matched but not UV-certified charged scalar quirkonium
+feasibility calculation now has a full one-shot AF Condor task.
+
+**Exactly one command on UChicago AF** (after cloning the branch):
+
+    cd ~/quirkonium-helicity-pilot && git pull --ff-only origin research/pilot1-literature-model-gate && bash scripts/submit_fcc_survival_one_shot.sh
+
+It submits ONE HTCondor worker job, sources Key4HEP and LHAPDF,
+runs all regression tests, then calculates BOTH FCC scenarios
+(85 TeV/20 ab^-1 and 100 TeV/30 ab^-1), both mass-splitting
+branches, and confinement scales LambdaPrime=[1,2,3,5,10] GeV.
+
+The full source-informed calculation now combines:
+- EW W*-mediated LO PDF production, both charge cross sections;
+- beta three-body width from Forsyth App A.1 Eq (A.1);
+- string tension sigma_string=3.6 LambdaPrime^2;
+- photon-only deexcitation upper time from Eq (2.11) at
+  each partonic E_T=sqrt(shat), and survival Eq (3.6);
+- source PDF-weighted survived charged-pair production
+  and survival-dependent W+ rapidity distributions;
+- one-time per-y W+ leptonic WZ angle reconstruction
+  recycled across all Lambda values;
+- per scenario and Lambda: charged survival, reconstructed
+  signed a1 contrast, background-free simple-moment clean
+  3sigma selected signal count, and minimum remaining
+  selection epsilon; no detector or SM WZ background;
+- independent integrated LO production crosscheck,
+  weak-scale top-Yukawa size and tree-level scalar doublet
+  mass consistency (not full folded-SUSY UV viability);
+- JSON + Markdown report and HTCondor logs under
+  /data/aalida/quirkonium-production/fcc_survival_one_shot_20261108/.
+
+**Critical source audit in the same run:** the paper's rough
+Eq (3.5) beta lifetime ~1e-12 s at |Delta|=10 GeV
+and the printed exact Eq (A.1) width numerically imply
+a lifetime ~2.2e-17 s at M1000, Delta10 GeV (factor
+~4.5e4 difference). This is a major source/matching
+normalization or physics interpretation tension.
+Both expressions are recorded side by side, and the
+run uses Eq (A.1) integral for survival, WITHOUT
+forcing agreement with Eq (3.5). Physical inference
+is suspended until the discrepancy is independently
+resolved. No paper-reach claim is justified.
+
+This is a compact bound-state-annihilation model
+and does NOT simulate the user's ATLAS macroscopic-string
+quirk trajectories. W+ angular-sign inference only;
+W- CP-conjugate phase unvalidated.
+
+Full technical protocol:
+validation/FCC_ONE_SHOT_SURVIVAL_TASK_2026-11-08.md
+Code:
+scripts/quirkonium_fcc_survival_one_shot.py
+Submission:
+scripts/submit_fcc_survival_one_shot.sh
+Regression tests:
+tests/test_quirkonium_fcc_survival_one_shot.py
+
+**Implementation committed, but the new survival job has NOT
+yet been run on UChicago AF, so no numerical survival outcome
+is asserted here.**
