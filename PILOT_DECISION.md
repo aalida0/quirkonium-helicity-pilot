@@ -311,3 +311,42 @@ do not add an arbitrary x3. No physical UV, deexcitation,
 acceptance, or SM WZ background claim is justified.
 
 See validation/CHARGED_PRODUCTION_USER_RESULTS_2026-11-08.md.
+
+
+## 2026-11-08 AF full-CKM LO production and toy-statistical gate
+
+User-ran Key4HEP LHAPDF 6.5.5 MSTW2008lo68cl member 0,
+both beam configurations and both W charges, full 2x3 CKM
+initial flavors. M500 charged-pair LO sigma:
+13.6 TeV low/high=61.777/61.774 fb;
+14 TeV low/high=65.022/65.019 fb.
+Both numerical integration drift <=0.001%, compared with earlier
+ud-only 59.181/59.178 fb (13.6 TeV) and 62.170/62.167 fb
+(14 TeV). Full-CKM adds ~4.4%-4.6% over ud-only.
+
+The 12x24 FIXED BOOST TOY (still not demonstrated quadrature
+converged) requires 90.71 fb charged-pair production at
+survival=1, efficiency=1, no background, for 3sigma using the
+**specific simple cosPhi moment estimator**. Full-CKM
+P_survival * efficiency required=1.468 at 13.6 TeV and 1.395
+at 14 TeV, impossible under those ideal assumptions.
+**FAIL this toy moment necessary-yield gate; NOT a generic
+no-go on any full-dimensional likelihood, different selection,
+or an alternate quirkonium paper.**
+
+The AF full-CKM cross-section calculation itself printed all
+four numerical results but FAILED at JSON serialization:
+TypeError keys must be str ... not tuple. The CKM provenance
+dictionary used (up,down) tuple keys. The script now converts
+it to JSON-safe explicit CKM flavor records; an offline
+test checks serialization. The user must pull and rerun to
+save the full-CKM JSON, and report current unittest status.
+
+Physics caveats: hidden-color normalisation of source Eq A2
+not independently rederived; actual P_survival, realistic
+kinematics and backgrounds uncomputed; low-tanbeta folded-SUSY
+UV viability UNKNOWN. Do not invest in detector simulation
+or repeat amplitudes just to rescue a failing simple moment.
+
+Detailed report:
+validation/CHARGED_PRODUCTION_USER_RESULTS_2026-11-08.md
