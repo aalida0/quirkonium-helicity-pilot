@@ -556,3 +556,55 @@ FCC-hh quirkonium survival, NO-GO for a paper/discovery
 sensitivity until survival, fiducial acceptance and
 backgrounds plus physical model and numerical convergence
 are established.
+
+
+## 2026-11-08: one-command FCC-hh deexcitation / beta lifetime / angular pilot
+
+Implemented source-matched physics and tests, not yet USER-RUN
+on UChicago AF:
+- scripts/quirkonium_fcc_survival_one_shot.py
+- tests/test_quirkonium_fcc_survival_one_shot.py
+- scripts/submit_fcc_survival_one_shot.sh
+- validation/FCC_ONE_SHOT_SURVIVAL_TASK_2026-11-08.md
+
+A single HTCondor submission command after git pull
+builds one Key4HEP worker job for 85/100 TeV,
+full CKM MSTW2008lo68cl, LambdaPrime 1/2/3/5/10 GeV,
+M500 low/high tanbeta, with all repo unit tests,
+source A1 three-body beta decay, Eq2.11 photon-only
+deexcitation from the true partonic ET=sqrt(shat),
+Eq3.6 PDF-weighted charged survival, and efficiently
+reweighted W+ reconstructed cosPhi moments. JSON and
+human-readable Markdown output are written on /data.
+The code computes W+ and W- raw/survived rates but
+does NOT assume a validated W- signed angular map.
+Survival varies across the LO x1x2 kinematics, not
+a global ad hoc constant.
+
+**SERIOUS SOURCE CONSISTENCY RED FLAG:**
+In the 2025 paper, Eq3.5 states rough tau_beta~1e-12s
+at Delta=10 GeV, whereas direct numerical evaluation
+of printed EqA1 (GF² Delta⁵/(6 pi³), integral->2/5)
+gives ~2.22e-17s at M1000 Delta10. Factor ~4.5e4.
+The one-shot job reports both, and uses EqA1 for the
+explicit source-derived survival calculation. This
+normalization/interpretation discrepancy must be
+independently checked (and possibly discussed with
+authors) before treating the survival yield as physical.
+NO claim that the paper author used an incorrect
+value in their event simulations is justified: they
+explicitly say simulations use EqA1.
+
+Existing model-domain PASS is only common SU(2)L
+soft-doublet tree masses. Low tanbeta weak-scale y_t
+is large; full RGE perturbativity and folded SUSY
+UV spectrum still UNKNOWN. Infracolor hidden-glueball
+cooling, hard ISR, deexcitation recoil, actual
+WZ acceptance and SM background are not simulated.
+This is compact scalar quirkonium, not the macroscopic
+ATLAS quirk-string regime.
+
+**Decision:** a source-audited model-conditional survival
+and ideal signal-only numerical gate is worth running.
+Publication and detector/fiducial sensitivity remain NO GO.
+Task currently COMMITTED but not yet executed on user's AF.
