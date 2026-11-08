@@ -156,3 +156,71 @@ No background, final resonance recoil, full hidden-color
 production normalization independent reproduction, W-
 CP-conjugate angular map, source-matched charged deexcitation
 survival, or low-tanbeta UV model consistency has been established.
+
+
+## Follow-up controlled PDF-resolution refinement (user-run)
+
+Run on UChicago AF with identical angular integration in both
+cases (polar=8, Phi=16, W orientation=5), full CKM,
+MSTW2008lo68cl member0, W+ charge only. Increased
+rapidity integration nodes 24 -> 40 and log-shat nodes 40 -> 64,
+holding independent triangular cross-check at 72 nodes.
+
+Output saved on AF (not attached):
+/data/aalida/quirkonium-production/fcc_pdf_rapidity_refined40x64.json
+
+| Observable | 85 TeV 24x40 | 85 TeV 40x64 | 100 TeV 24x40 | 100 TeV 40x64 |
+|---|---:|---:|---:|---:|
+| W+ pair sigma low (fb) | 562.17 | 562.16 | 691.48 | 691.50 |
+| total charge-summed sigma low (fb) | 951.87 | 951.86 | 1179.6 | 1179.7 |
+| independent integral closure | 0.002% | 0.002% | 0.003% | printed 0.000% |
+| truth a1 low/high | +/-0.120513 | +/-0.120513 | +/-0.120513 | +/-0.120513 |
+| min-abs-pz a1 low | +0.027294 | **+0.028303** | +0.027493 | **+0.027848** |
+| min-abs-pz a1 high | -0.026197 | **-0.027177** | -0.026392 | **-0.026731** |
+| signed delta a1 | +0.053490 | **+0.055480** | +0.053885 | **+0.054579** |
+| root correct fraction | 0.574 | **0.579** | 0.575 | **0.577** |
+| 3sigma signal-only N selected | 6356 | **5908** | 6263 | **6105** |
+| required Psurvival*eff | 0.051641 | **0.048002** | 0.027580 | **0.026883** |
+
+The signed min-|pz| contrast changes +3.72% at 85 TeV
+and +1.29% at 100 TeV with improved PDF quadrature.
+The ideal background-free selected event requirements fall
+~7.05% and ~2.52% respectively. Both signs remain opposite.
+The unmodified independent integrated production cross-check
+remains excellent, but that DOES NOT independently validate
+the differential rapidity shape or final-state angular observable.
+
+**PDF-y moment numerical convergence is not yet certified:**
+two discretizations are insufficient for stable precision claims
+given the root-switching discontinuity. A third check can be
+reserved for after angular refinement, rather than a long sweep.
+
+### Recommended next numerical test (not yet user-run)
+
+Use the SAME refined PDF integration 40 rapidity x 64 log-shat
+and SAME W orientation=5; increase angular integration
+polar 8 -> 12 and phi 16 -> 24. For resource reasons start
+with just 85 TeV/20 ab^-1 and save a distinct JSON:
+
+    python scripts/quirkonium_fcc_pdf_rapidity_gate.py \
+      --pdf-set MSTW2008lo68cl --scenarios 85:20000 \
+      --mass 500 --tanbeta-high 3 \
+      --polar-nodes 12 --phis 24 --orientations 5 \
+      --rapidity-nodes 40 --shat-nodes 64 --reference-nodes 72 \
+      --flavor-mode full-ckm --charge-mode wplus \
+      --output /data/aalida/quirkonium-production/fcc85_ang12x24_pdf40x64.json
+
+At this resolution the deterministic Python six-leg reconstruction
+is substantially more computationally expensive than 8x16; it
+is not an urgent login-node task. Prefer an AF batch worker
+if login-node interactive jobs are restricted; do not repeatedly
+launch dense grids on shared login nodes.
+
+### Physical interpretation unchanged
+
+Production-only statistical gate PASS under the toy
+signal-only moment model, but *not* a detector reach forecast
+or publication GO. No actual deexcitation survival/ISR/recoil,
+SM WZ background, lepton fiducial cuts, low-tanbeta
+UV viability, W- angular CP convention, or an independent
+infracolor color-normalization reproduction exists.
