@@ -398,3 +398,47 @@ Next do 1) source normalization cross-check for hidden color;
 3) survival/acceptance and SM WZ background;
 4) UV perturbativity of tanbeta~0.395. Do not start
 a broad scan or detector chain beforehand.
+
+
+## 2026-11-08: launch production-weighted FCC W+ longitudinal-boost pilot
+
+After real LHAPDF results at 27/85/100 TeV, IMPLEMENTED (not yet
+run on user AF) an independent double Gauss-Legendre PDF integral
+for the initial squirk pair rapidity y=(ln x1-ln x2)/2. Uses
+tau=ln(x1*x2) and an *independent* production cross-section check
+against the earlier ln(x1),ln(x2) LO integral, to 2% preliminary
+numerical tolerance. Combined with exact W+Z spin-correlated decay
+and smaller-|pz| neutrino reconstruction; no detector/ISR/recoil.
+
+**Primary mode is W+ ONLY**, avoiding an unjustified assumption
+that the signed lepton-plane convention already validated for
+W+Z can simply be combined with W-Z without a charge-conjugate
+phase analysis. This differs from previous charge-summed
+inclusive cross sections and is NOT a rate inconsistency.
+
+The script separately recomputes the required 3sigma/5sigma
+*signal-only simple cosPhi moment* event counts and the necessary
+P_charged_survival * epsilon for each FCC scenario using
+the W+ PDF-weighted rapidities, rather than reusing the 90.71 fb
+uniform-boost HL-LHC toy threshold.
+
+SCRIPT: scripts/quirkonium_fcc_pdf_rapidity_gate.py
+TESTS: tests/test_quirkonium_fcc_pdf_rapidity_gate.py
+PROTOCOL: validation/FCC_PDF_WEIGHTED_RAPIDITY_PILOT_2026-11-08.md
+
+Status: COMMITTED_BUT_USER_EXECUTION_PENDING. Do not promote this
+code into a quantified FCC-hh result until AF numerical PDF
+normalization closure, truth-a1 closure and controlled angular/
+rapidity grid comparisons pass.
+
+The computed y is of the **initial pair CM**. Using it for the
+final bound-state X boost omits possible hidden glueball
+deexcitation recoil; therefore it is a controlled approximation,
+not a complete signal kinematics generator.
+
+Other paper blockers still stand: physical low tanbeta~0.395
+SUSY model viability, hidden SU(3) source normalization,
+charged-state survival versus beta decay, W- CP analysis,
+realistic SM WZ backgrounds and fiducial acceptance.
+Current paper verdict remains NO-GO; new narrowly scoped
+FCC PDF-reconstruction feasibility gate is GO to test.
