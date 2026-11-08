@@ -543,3 +543,65 @@ survival and SM WZ backgrounds are missing.
 
 Source details, output interpretation and stop criteria:
 validation/CHARGED_PRODUCTION_GATE_2026-11-08.md.
+
+
+### 2026-11-08: FCC-hh PDF-weighted longitudinal-boost pilot (new code)
+
+Following the user's UChicago AF LHAPDF production results, the
+27 TeV (188.76 fb), 85 TeV (951.85 fb), and 100 TeV (1179.7 fb)
+full-CKM *charge-summed* LO charged-squirk rates pass the
+respective illustrative **production-only** ideal yield thresholds
+at 15/20/30 ab^-1. They do NOT establish a physical FCC-hh reach.
+
+Implemented scripts/quirkonium_fcc_pdf_rapidity_gate.py to go beyond
+arbitrary resonance-rapidity toy grids: an independently integrated
+LO x1,x2 PDF-weighted *initial squirk-pair* rapidity spectrum
+y=(ln x1-ln x2)/2 from the published Forsyth partonic production
+formula. Its y,ln(s-hat) Jacobian integral crosschecks against
+the preexisting triangular ln x1,ln x2 convolution; disagreement
+>2% blocks the angular results. Keeps W+ and W- differential rates
+separate. The default --charge-mode wplus is conservative because
+the validated signed Phi convention is specifically for
+W+Z->e+nu mu+mu-; including W- is an unvalidated CP
+assumption. The new script uses weighted rapidity nodes with
+memory-streamed exact-MET neutrino-pz angular reconstruction,
+returns a1,a2 and **new** clean signal moment counts for each
+energy. The previous uniform-boost 2979-event threshold must
+not be transferred to a different PDF-weighted ensemble.
+
+**Critical conditional approximation:** the rapidity of the initial
+hard-scattering charged squirk pair is assumed to be inherited by
+the final WZ-annihilating ground state. Infracolor cooling/recoil,
+initial-state radiation, state transitions and beta decay are NOT
+modeled. There is no detector, background or fiducial selection.
+The source Eq A2 hidden-color normalisation audit and low-tanbeta
+SUSY-UV model viability are PENDING. Do not call this a
+physical sensitivity/reach prediction.
+
+Offline regression tests:
+tests/test_quirkonium_fcc_pdf_rapidity_gate.py.
+Instructions and STOP/GO gates:
+validation/FCC_PDF_WEIGHTED_RAPIDITY_PILOT_2026-11-08.md.
+
+On UChicago AF with Key4HEP 2026-02-01 and
+MSTW2008lo68cl PDF visible via LHAPDF_DATA_PATH:
+
+    cd ~/quirkonium-helicity-pilot
+    git pull --ff-only origin research/pilot1-literature-model-gate
+    python -m unittest discover -s tests -v
+
+    mkdir -p /data/aalida/quirkonium-production
+    python scripts/quirkonium_fcc_pdf_rapidity_gate.py \
+      --pdf-set MSTW2008lo68cl \
+      --scenarios 85:20000 100:30000 \
+      --mass 500 --tanbeta-high 3 \
+      --polar-nodes 5 --phis 12 --orientations 5 \
+      --rapidity-nodes 24 --shat-nodes 40 \
+      --reference-nodes 72 --flavor-mode full-ckm \
+      --charge-mode wplus \
+      --output /data/aalida/quirkonium-production/fcc_pdf_rapidity_pilot.json
+
+This new differential workflow is COMMITTED, **NOT YET USER-RUN**.
+Check cross-section closure before interpreting any moments;
+repeat at controlled angular/rapidity integration orders to
+assess convergence.
