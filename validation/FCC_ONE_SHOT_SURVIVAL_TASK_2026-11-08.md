@@ -192,3 +192,30 @@ charged/neutral channel.
 Once this one command completes, audit the reported
 A1-vs-Eq3.5 lifetime discrepancy, rather than
 starting yet another lengthy amplitude/angles chain.
+
+
+## 2026-11-08: UChicago AF Condor submission directory correction
+
+User reported that HTCondor submission files belong under
+their /home workspace, while bulk outputs should be under /data.
+The first launcher put all of its job control, executable,
+log and output paths under /data and the user saw:
+  ERROR: Failed to commit job submission into the queue.
+The scheduler error does NOT prove that the /data placement
+was its sole cause.
+
+The launcher now uses:
+- Job worker, submit.sub, condor event/stdout/stderr logs:
+  /home/aalida/quirkonium-helicity-pilot/condor/fcc_survival_one_shot_20261108/
+- Physics JSON and Markdown (results only):
+  /data/aalida/quirkonium-production/fcc_survival_one_shot_20261108/
+
+The submitter changes to the job home directory for condor_submit,
+and declares initialdir there. It does not use /data as its
+Condor submission directory. The exact one-command invocation
+remains unchanged (git pull then bash launcher).
+
+If scheduler queue-commit still fails, collect:
+  condor_submit -debug ~/quirkonium-helicity-pilot/condor/fcc_survival_one_shot_20261108/submit.sub
+and the schedd authorization/connection diagnostics. Do not
+claim that changing directories alone fixed the scheduler.
