@@ -276,3 +276,38 @@ validation/FEASIBILITY_USER_RESULTS_2026-11-08.md.
 Publication: NO-GO from signed a1 alone. Small STOP/GO
 screen on σ(pp→Ψ±) and source-matched model validity before
 any broader theoretical or collider study.
+
+
+## 2026-11-08: actual Key4HEP/LHAPDF ud-only production gate
+
+On UChicago AF the user ran Key4HEP (Python 3.13.8, LHAPDF 6.5.5,
+MSTW2008lo68cl member 0) with the repo's Forsyth-Appendix-A.2
+W*-mediated SM-colorless charged-pair cross section and --flavor-mode ud.
+Both W charges and proton beam assignments are included.
+
+M=500 GeV, 13.6 TeV: low/high sigma pair = 59.181/59.178 fb.
+14.0 TeV: low/high sigma pair = 62.170/62.167 fb.
+Numerical quadrature drift (48 -> 72 nodes) = 0.001%.
+
+Given the user's fixed-ensemble 12x24 simple cosPhi toy needs
+2979 selected clean trileptons, it requires sigma(pair)>90.71 fb
+at L=3000/fb *even if* charged bound-state survival=1,
+selection/reconstruction efficiency=1 and background=0.
+Consequently the ud-only source-channel LO PDF result is
+**FAIL for this specific necessary toy-moment yield criterion**
+(required P_survival*epsilon=1.533 at 13.6 TeV,
+1.459 at 14 TeV). This is NOT a universal statistical no-go
+because the chosen moment is not optimal and full CKM flavor
+channels, source normalisation and rapidity dependence are not
+yet fully audited.
+
+Mandatory next cheap check: rerun
+scripts/quirkonium_production_pdf_gate.py
+--flavor-mode full-ckm
+with the same MSTW2008lo68cl PDF, masses 500 and energies 13.6/14,
+recording output in an independent JSON. Then independently audit
+whether Eq(A.2) includes the hidden-SU(3) final-color multiplicity;
+do not add an arbitrary x3. No physical UV, deexcitation,
+acceptance, or SM WZ background claim is justified.
+
+See validation/CHARGED_PRODUCTION_USER_RESULTS_2026-11-08.md.
