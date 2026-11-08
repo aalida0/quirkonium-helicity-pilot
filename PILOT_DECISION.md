@@ -350,3 +350,51 @@ or repeat amplitudes just to rescue a failing simple moment.
 
 Detailed report:
 validation/CHARGED_PRODUCTION_USER_RESULTS_2026-11-08.md
+
+
+## 2026-11-08: HE-LHC / FCC-hh full-CKM electroweak production (user-run)
+
+UChicago AF Key4HEP LHAPDF6.5.5, MSTW2008lo68cl member 0.
+Full-CKM W+/W- charge-summed, both beams, M=500 GeV,
+low/high tanbeta=0.394724/3; stable LO PDF integrations:
+
+- HE-LHC scenario 27 TeV, L=15 ab^-1:
+  sigma_pair low/high = 188.76 / 188.75 fb,
+  quadrature relative drift=0.003%,
+  required P_survival*epsilon for the old simple moment=0.09611.
+- FCC-hh scenario 85 TeV, L=20 ab^-1:
+  951.85 / 951.81 fb, drift=0.000%,
+  required P_survival*epsilon=0.01430.
+- FCC-hh scenario 100 TeV, L=30 ab^-1:
+  1179.7 / 1179.6 fb, drift=0.001%,
+  required P_survival*epsilon=0.007689.
+
+These production results were user-run and saved on AF;
+see validation/FUTURE_COLLIDER_PRODUCTION_GATE_2026-11-08.md.
+
+**Decision shift:**
+- For the SPECIFIC nonconverged 12x24 fixed-boost background-free
+  simple cosPhi moment, the HL-LHC production-only necessary
+  yield FAILS; HE-LHC 27 TeV and FCC-hh production-only
+  necessary yield PASS under the illustrative luminosities.
+- At 10% selection efficiency (separate from charged survival),
+  the latter tests require charged P_survival>=96.1% (27),
+  14.3% (85), 7.69% (100). Actual P_survival and epsilon
+  are UNKNOWN, as is S/B and realistic collider kinematic dilution.
+- These are **not physical significance/exclusion forecasts**.
+  The toy's fake uniform boost ensemble and nonconverged angular
+  integration are insufficient to reuse the same 2979 selected
+  signal count at 27/85/100 TeV. Realistic PDF-weighted
+  production y/hat-s and bound-state survival vs beta decay
+  must replace it.
+- Given sufficient FCC-hh raw rate, **CONDITIONAL GO for a
+  tightly scoped no-detector FCC-hh feasibility pilot**.
+  Still **NO GO** for paper claim until physical low-tanbeta
+  branch, model normalization, novel inference and backgrounds
+  are demonstrated. Generic diboson a1 interference is known.
+
+Next do 1) source normalization cross-check for hidden color;
+2) PDF-weighted parent rapidity and analytic 2->4 reconstruction;
+3) survival/acceptance and SM WZ background;
+4) UV perturbativity of tanbeta~0.395. Do not start
+a broad scan or detector chain beforehand.
