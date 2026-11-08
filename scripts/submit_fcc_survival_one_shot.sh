@@ -4,8 +4,8 @@
 # Optional on an allocated worker: bash scripts/submit_fcc_survival_one_shot.sh --local
 
 set -Eeuo pipefail
-REPO="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="/data/\${USER}/quirkonium-production/fcc_survival_one_shot_20261108"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RUN_DIR="/data/${USER}/quirkonium-production/fcc_survival_one_shot_20261108"
 mkdir -p "$RUN_DIR"
 
 WORKER="$RUN_DIR/worker.sh"
@@ -36,10 +36,10 @@ python scripts/quirkonium_fcc_survival_one_shot.py \\
 EOF
 chmod 750 "$WORKER"
 
-if [[ "\${1:-}" == "--local" ]]; then
+if [[ "${1:-}" == "--local" ]]; then
   echo "RUNNING LOCALLY (avoid on a busy shared login node)"
   bash "$WORKER" 2>&1 | tee "$RUN_DIR/local.log"
-  exit "\${PIPESTATUS[0]}"
+  exit "${PIPESTATUS[0]}"
 fi
 
 if ! command -v condor_submit >/dev/null 2>&1; then
