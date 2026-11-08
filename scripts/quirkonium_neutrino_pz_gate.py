@@ -156,39 +156,91 @@ def summarize_moments(rows):
     out["weight_total"]=total
     return out
 
-def run_one(m,t,nodes,phis,norient,rapidities):
+def run_one(m,t,nodes,phis,norient,rapidities,rapidity_weights=None):
+    """Integrate joint 2->4 angles and kinematic roots at chosen rapidities.
+
+    A supplied list of nonnegative *production* rapidity weights is
+    normalized here. Older calls without weights retain the exact
+    equally weighted rapidity ensemble used in previous pilots.
+    Moments are accumulated online to keep memory O(1) rather than
+    materializing O(N_angles * N_rapidity) event dictionaries.
+    """
     import numpy as np
+    rapidities=[float(y) for y in rapidities]
+    if not rapidities or any(not math.isfinite(y) for y in rapidities):
+        raise ValueError("Need finite nonempty rapidities")
+    if rapidity_weights is None:
+        rapidity_weights=[1.]*len(rapidities)
+    else:
+        rapidity_weights=[float(w) for w in rapidity_weights]
+    if len(rapidity_weights)!=len(rapidities):
+        raise ValueError("Rapidity positions and weights have different lengths")
+    if (any(not math.isfinite(w) or w<0 for w in rapidity_weights)
+        or sum(rapidity_weights)<=0):
+        raise ValueError("Rapidity weights must be finite, nonnegative and nonzero")
+    norm=sum(rapidity_weights)
+    rapidity_weights=[w/norm for w in rapidity_weights]
     cw,wcw=np.polynomial.legendre.leggauss(nodes)
     cz,wcz=np.polynomial.legendre.leggauss(nodes)
     co,wco=np.polynomial.legendre.leggauss(norient)
     phivecs=[2*math.pi*k/phis for k in range(phis)]
     setup=Setup(m,splitting(m,t),"Z")
-    data=[];maxclosure=0.
+    labels=("truth","min_abs_pz","known_resonance_mass","equal_roots")
+    sums={lab:{"cos":0.,"cos2":0.} for lab in labels}
+    total=0.; minpz_correct=0.; known_correct=0.
+    maxclosure=0.; npoints=0
     for c,wa in zip(cw,wcw):
         for d,wb in zip(cz,wcz):
             for phi in phivecs:
                 spinweight=joint_density(setup,float(c),float(d),phi)
-                if spinweight<-1e-13:raise RuntimeError("Negative angular density")
+                if spinweight<-1e-13:
+                    raise RuntimeError("Negative angular density")
                 for o,wo in zip(co,wco):
                     theta=math.acos(float(o))
-                    for y in rapidities:
+                    angular_weight=float(wa*wb*wo)*spinweight*(
+                        2*math.pi/phis)/2.
+                    for y,wy in zip(rapidities,rapidity_weights):
+                        if wy==0:continue
                         ev=lab_event(m,t,float(c),float(d),phi,theta,y)
                         obs=reco_angles(ev,m)
                         # Exact truth-pz closure in the SAME helicity convention.
                         closure=abs(math.atan2(math.sin(obs["truth"]-phi),
                                                math.cos(obs["truth"]-phi)))
                         maxclosure=max(maxclosure,closure)
-                        if closure>1e-8:raise RuntimeError(
-                            f"Truth-angle closure failed: {closure}, phi={phi}")
-                        weight=float(wa*wb*wo)*spinweight*(2*math.pi/phis)/(
-                            2*len(rapidities))
-                        data.append((weight,obs))
-    moments=summarize_moments(data)
+                        if closure>1e-8:
+                            raise RuntimeError(
+                                f"Truth-angle closure failed: {closure}, phi={phi}")
+                        weight=angular_weight*wy
+                        total+=weight
+                        minpz_correct+=weight*obs["minpz_is_true"]
+                        known_correct+=weight*obs["known_mass_is_true"]
+                        for label in labels:
+                            if label=="equal_roots":
+                                c1=obs["equal_roots_cos"]
+                                c2=obs["equal_roots_cos2"]
+                            else:
+                                angle=obs[label]
+                                c1=math.cos(angle)
+                                c2=math.cos(2*angle)
+                            sums[label]["cos"]+=weight*c1
+                            sums[label]["cos2"]+=weight*c2
+                        npoints+=1
+    if total<=0:raise RuntimeError("zero total probability")
+    moments={}
+    for label in labels:
+        a1=2*sums[label]["cos"]/total
+        a2=2*sums[label]["cos2"]/total
+        moments[label]={"a1":a1,"a2":a2,
+                        "variance_simple_moment_coefficient":2+a2-a1*a1}
+    moments["minpz_correct_fraction"]=minpz_correct/total
+    moments["known_mass_correct_fraction"]=known_correct/total
+    moments["weight_total"]=total
     moments["tanbeta"]=t
     moments["delta"]=setup.delta
     moments["analytic_closed_a1"]=azimuthal_cos1_amplitude(setup)
     moments["max_truth_angle_closure_radians"]=maxclosure
-    moments["n_weighted_points"]=len(data)
+    moments["n_weighted_points"]=npoints
+    moments["rapidity_weights_normalized"]=True
     return moments
 
 def sign_cost(b0,b1,label,z):
