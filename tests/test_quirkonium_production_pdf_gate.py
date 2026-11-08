@@ -10,7 +10,8 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from quirkonium_production_pdf_gate import (
-    partonic_fb,pdf_convolution,make_point,channels,ceiling)
+    partonic_fb,pdf_convolution,make_point,channels,ceiling,
+    ckm_metadata_json, CKM)
 
 class UniformXF:
     """Deliberately UNPHYSICAL positive test fixture: x*f(x)=constant."""
@@ -63,6 +64,24 @@ class SourceProductionTests(unittest.TestCase):
         self.assertEqual(row["source_partonic_sign_parity_residual"],0.)
         self.assertEqual(row["low"]["ceiling"]["fiducial_efficiency"],
                          "UNKNOWN")
+
+    def test_full_ckm_metadata_is_json_serializable(self):
+        # Regression for 2026-11-08 AF run: the earlier output used
+        # CKM tuple keys, which caused TypeError in json.dumps()
+        # only AFTER the physics integrations completed.
+        import json
+        records=ckm_metadata_json()
+        self.assertEqual(len(records),len(CKM))
+        payload={"mode":"full-ckm","CKM_approx":records}
+        restored=json.loads(json.dumps(payload,allow_nan=False))
+        self.assertEqual(restored["mode"],"full-ckm")
+        self.assertEqual(len(restored["CKM_approx"]),6)
+        self.assertEqual(
+            {(p["up_pdg"],p["down_pdg"]) for p in records},
+            set(CKM))
+        for r in records:
+            self.assertAlmostEqual(r["V_squared_approx"],
+                                   CKM[(r["up_pdg"],r["down_pdg"])]**2)
 
     def test_ceiling_is_necessary_only(self):
         low=ceiling(80.,90.71)
