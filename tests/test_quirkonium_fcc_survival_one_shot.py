@@ -28,7 +28,8 @@ class UniformXF:
 class FormulaTests(unittest.TestCase):
     def test_source_integral_small_delta_limit(self):
         # Source A1 directly states integral -> 2/5 as delta/M -> 0.
-        r=beta_decay_width_A1(1e7,10.,96)
+        # Hold Delta/mW small as well as Delta/M.
+        r=beta_decay_width_A1(1e7,.01,96)
         self.assertAlmostEqual(r["dimensionless_A1_integral"],
                                .4,delta=1e-5)
 
