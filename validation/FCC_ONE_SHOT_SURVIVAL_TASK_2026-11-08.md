@@ -219,3 +219,47 @@ If scheduler queue-commit still fails, collect:
   condor_submit -debug ~/quirkonium-helicity-pilot/condor/fcc_survival_one_shot_20261108/submit.sub
 and the schedd authorization/connection diagnostics. Do not
 claim that changing directories alone fixed the scheduler.
+
+
+## 2026-11-08: HTCondor zero-match FileSystemDomain failure, definitive correction
+
+User submitted original JOB cluster 4194213.000 successfully, but
+condor_q 4194213 -better-analyze revealed that:
+- 142/142 available execute slots failed the additional condition:
+  TARGET.FileSystemDomain == MY.FileSystemDomain.
+- All 142 otherwise passed Architecture, OS and Disk; 135 passed Memory.
+- User job FileSystemDomain was "nfs.af.uchicago.edu".
+- Cause in our submit file: should_transfer_files = NO.
+  HTCondor automatically adds a same-file-system-domain requirement
+  in that mode; NONE of the workers matched.
+
+Permanent launcher fix: should_transfer_files=YES,
+when_to_transfer_output=ON_EXIT, transfer_input_files=source.tar.gz.
+Source archive is a git-tracked snapshot generated at submission
+in the Condor job HOME folder (not /data). The Condor worker
+unpacks and runs entirely in its execute-side scratch directory:
+it DOES NOT need to mount the submitter's /home checkout. Worker
+uses Key4HEP/LHAPDF via CVMFS. Its JSON/MD output files are
+transported back via transfer_output_files and
+transfer_output_remaps to /data/aalida/quirkonium-production/
+fcc_survival_one_shot_20261108/, on the access/submit host.
+Submit descriptions, executable, source archive, and all logs
+remain in the repository's /home/aalida/.../condor/ folder.
+Even a physics/test failure generates an explicitly labeled
+FAILED JSON/Markdown result on the worker for diagnostics;
+a failed job does not imply physics results.
+
+To replace old cluster 4194213 (queued, incapable of matching)
+with one fixed-file-transfer job, use exactly ONE shell command:
+
+    condor_rm 4194213 && cd ~/quirkonium-helicity-pilot && git pull --ff-only origin research/pilot1-literature-model-gate && bash scripts/submit_fcc_survival_one_shot.sh
+
+Then check the newly assigned cluster ID:
+
+    condor_q NEWID -better-analyze
+
+Do not try to fix this by only moving paths under /home
+or adding arbitrary Requirements overrides. Correct
+file staging is necessary, not just changing the scheduler
+expression. This fix has been committed to GitHub but
+has NOT been run yet on the user's AF.
