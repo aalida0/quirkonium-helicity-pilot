@@ -29,6 +29,17 @@ FB_PER_GEV2=3.893793656e11
 CKM={(2,1):.97373,(2,3):.2243,(2,5):.00382,
      (4,1):.221,(4,3):.975,(4,5):.0410}
 
+def ckm_metadata_json():
+    """Lossless, JSON-safe CKM provenance; PDG flavor-pair keys are tuples.
+
+    json.dumps(CKM) is invalid because JSON object keys cannot be tuples.
+    A sorted list of explicit (up,down) records retains this information
+    without converting numbers into ambiguous composite string keys.
+    """
+    return [{"up_pdg":up,"down_pdg":down,
+             "abs_V_approx":value,"V_squared_approx":value*value}
+            for (up,down),value in sorted(CKM.items())]
+
 def partonic_fb(shat,mass,delta):
     """The published partonic sigma, in fb; one incoming flavor process."""
     if not all(math.isfinite(a) for a in (shat,mass,delta)):
@@ -162,7 +173,7 @@ def main():
     result={"source":"Forsyth et al PRD111 115021 (2025), Eqs A2-A3",
             "PDF":args.pdf_set,"member":args.pdf_member,
             "mode":args.flavor_mode,"CKM_approx":(
-                CKM if args.flavor_mode=="full-ckm" else None),
+                ckm_metadata_json() if args.flavor_mode=="full-ckm" else None),
             "extra_hidden_color_multiplier":"NONE",
             "infracolor_normalization_source_audit":"PENDING",
             "Q_over_M":args.scale_ratio,
