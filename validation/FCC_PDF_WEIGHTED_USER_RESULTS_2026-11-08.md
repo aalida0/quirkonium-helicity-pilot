@@ -104,3 +104,55 @@ claim formal collider reach until then.
 
 Sources: Forsyth et al arXiv:2504.02940 Sec 2/3 and
 Appendix A.2. LHAPDF 6 arXiv:1412.7420.
+
+
+## Follow-up controlled angular refinement: PDF grid held fixed
+
+**Input:** user-run terminal output from
+/data/aalida/quirkonium-production/fcc_pdf_rapidity_ang8x16.json.
+Same MSTW2008lo68cl member 0, full-CKM W+ only, M500,
+PDF rapidity=24, log-shat=40, independent reference=72,
+W orientation=5. Angular quadrature changed ONLY:
+polar=5 and phi=12 -> polar=8 and phi=16.
+
+| Observable | 85 TeV, 5x12 | 85 TeV, 8x16 | 100 TeV, 5x12 | 100 TeV, 8x16 |
+|---|---:|---:|---:|---:|
+| W+ pair production (fb), low | 562.17 | 562.17 | 691.48 | 691.48 |
+| independent integrated PDF closure | .002% | .002% | .003% | .003% |
+| truth a1 low | +.121089 | +.120513 | +.121089 | +.120513 |
+| min-abs-pz a1 low | +.028833 | **+.027294** | +.026530 | **+.027493** |
+| min-abs-pz a1 high | -.027639 | **-.026197** | -.025333 | **-.026392** |
+| signed min-pz delta a1 | +.056472 | **+.053490** | +.051863 | **+.053885** |
+| correct min-pz root | .579 | .574 | .568 | .575 |
+| simple-moment selected N 3sigma | 5703 | **6356** | 6761 | **6263** |
+| min Psurv times efficiency | .046336 | **.051641** | .029773 | **.027580** |
+
+Interpretation:
+- The opposite a1 signs survive at both energies and both angular grids.
+- The 85 TeV required clean events increased ~11.4%;
+  the 100 TeV requirement decreased ~7.4%.
+  This is numerical dependence in the DISCONTINUOUS
+  smaller-|p_z| estimator, not physical uncertainty quantification.
+- Source PDF convolution is stable and unchanged, but this does
+  NOT prove differential angular convergence.
+- With an explicitly assumed *non-survival* efficiency=0.10,
+  current ideal background-free required survival probabilities:
+  85 TeV >= 51.641%, 100 TeV >=27.58%.
+  These are not physically calculated survival probabilities
+  or acceptance forecasts.
+
+### Next isolated numerical check
+
+Keep polar=8, phi=16, W orientation=5, and
+reference nodes=72, but change ONLY the PDF integration:
+rapidity=24 -> 40, log-shat=40 -> 64.
+This checks sensitivity to the production-boost sampling, not
+angular convergence. Save a DIFFERENT JSON.
+Then do a 12x24 angular check at fixed PDF nodes before
+declaring any final signed a1 coefficient. At present
+both kinds of convergence are UNKNOWN.
+
+No background, final resonance recoil, full hidden-color
+production normalization independent reproduction, W-
+CP-conjugate angular map, source-matched charged deexcitation
+survival, or low-tanbeta UV model consistency has been established.
