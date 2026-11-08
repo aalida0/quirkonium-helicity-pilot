@@ -608,3 +608,51 @@ ATLAS quirk-string regime.
 and ideal signal-only numerical gate is worth running.
 Publication and detector/fiducial sensitivity remain NO GO.
 Task currently COMMITTED but not yet executed on user's AF.
+
+
+## 2026-11-08: FCC photon-only survival one-shot USER RUN COMPLETED
+
+No-Condor local Key4HEP/MSTW2008lo68cl job succeeded and wrote
+JSON+Markdown under user's HOME. Internal numerical tests passed.
+See full transcribed results in
+validation/FCC_ONE_SHOT_USER_RESULT_2026-11-08.md.
+
+Physical full-CKM source LO production: W+ ~562.2 fb
+(85 TeV, 20 ab^-1), ~691.5 fb (100 TeV, 30 ab^-1).
+At LambdaPrime=5 GeV and source printed EXACT Appendix A.1
+beta lifetime, integrated charged survival low/high =
+0.9994/0.9990 for both scenarios.
+After survived W+ PDF weighting, min-|pz| signed
+Delta a1 = 0.055477 at 85 TeV, 0.054576 at 100 TeV.
+Simple no-background 3sigma moment needs ~5909 and 6106
+selected signal events. Minimum ADDITIONAL selection
+efficiency after modeled survival = 4.8058% (85) and
+2.6914% (100). Neither is an actual detector forecast.
+
+At LambdaPrime=1 GeV, survival low/high ~0.716/0.610
+and ~0.715/0.609 (85/100), but the necessary production-only
+toy still passes at efficiency=1. Full Lambda scan in
+validation/FCC_ONE_SHOT_USER_RESULT_2026-11-08.md.
+
+**Critical SOURCE CONSISTENCY:** Printed Appendix A.1 beta
+lifetime ~2-3e-17 s versus rough Eq3.5 ~1e-12 s
+for |Delta|~10 GeV; ratio ~4.5e4. Paper says its
+simulations themselves use Eq A.1, so do NOT infer
+they used wrong rates. Independent 3-body width
+verification or author clarification remains essential.
+2026 erratum does not mention this discrepancy.
+
+**Clarification:** The 13.6 TeV block earlier in the
+console was a nonphysical unit-test fixture with
+x*f(x,Q)=1 for all flavors, NOT a physical PDF
+run or LHC production forecast. The fixture's
+verbose collider output was subsequently suppressed.
+
+**Decision:** source-model photon cooling and W+
+signed-azimuth effect numerically preserved: CONDITIONAL
+GO to next physics validation. Paper/discovery reach
+remain NO GO pending lifetime source audit, UV viability,
+FIDUCIAL acceptances, SM WZ backgrounds, CP-conjugate W-
+sign convention, final-resonance recoil and angular
+numerical convergence. No more broad numerical grids
+without those physics gates.
