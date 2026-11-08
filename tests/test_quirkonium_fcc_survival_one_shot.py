@@ -101,10 +101,10 @@ class PDFSurvivalTests(unittest.TestCase):
         data=run_scenario(p,13.6,3000.,500.,3.,
                           [2.,5.],12,20,28,3,8,3,"ud")
         self.assertEqual(data["angular_charge_mode"],"W+ only")
-        self.assertEqual(data["low_tanbeta_UV_viability"]
-                         if "low_tanbeta_UV_viability" in data else
-                         data["physical_model"],
-                         data["physical_model"])
+        self.assertEqual(
+            data["source_beta_width_eqA1_vs_rough_eq3_5"],
+            "NUMERICAL_TENSION_EXPLICITLY_FLAGGED")
+        self.assertTrue(data["no_detector"])
         self.assertLess(data["branches"]["low"][
             "source_integral_vs_independent_relative"],.02)
         self.assertEqual(len(data["lambda_comparison"]),2)
