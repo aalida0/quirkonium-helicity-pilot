@@ -517,3 +517,42 @@ promote these toy requirements to FCC reach. Next do fixed
 8x16 angles, 5 orientation nodes, vary PDF y/shat quadrature
 24/40 ->40/64; then refine angular grid at fixed PDF nodes.
 See validation/FCC_PDF_WEIGHTED_USER_RESULTS_2026-11-08.md.
+
+
+## 2026-11-08: user-run 85 TeV 12x24 angular check at fixed PDF 40x64
+
+The user held full CKM MSTW2008lo68cl, 85 TeV/20 ab^-1,
+W+ only, mass M500, 40 y x64 shat PDF quadrature and 5 W
+orientation nodes fixed; changed angular polar/Phi nodes
+8x16 ->12x24. The W+ production remained 562.16 fb
+and independent source PDF total closure stayed 0.002%.
+Reconstructed signed a1 low/high shifted
++0.028303/-0.027177 -> +0.026504/-0.025360.
+Signed delta a1 moved 0.055480 -> 0.051864,
+and the ideal clean-signal 3sigma moment requirement increased
+5908 -> 6762 selected 3lnu events.
+Minimum P_survival*epsilon: 0.048002 -> 0.054940
+(5.494%). With epsilon=0.10, would require P_survival>=0.5494,
+under the ideal no-background toy.
+Truth a1 +/-0.120370 and charge-summed sigma 951.86 fb.
+
+**Interpretation:** opposite signs survive every sampled
+integration order, but reconstructed moments/event-count
+convergence still NOT ESTABLISHED (~6.5% coefficient change
+and 14.5% event-count change). This is not an FCC reach
+or exclusion estimate.
+
+**Stop-go priorities:** avoid an indefinite angular
+quadrature sweep; move to explicitly quirk-specific
+deexcitation/cooling versus constituent beta decay,
+independent source color normalization, and physical
+low-tanbeta model viability. Consider an alternative
+independent angular integration for a convergence check
+before any claim of quantified significance.
+See validation/FCC_PDF_WEIGHTED_USER_RESULTS_2026-11-08.md.
+
+**Current decision:** conditional technical GO for studying
+FCC-hh quirkonium survival, NO-GO for a paper/discovery
+sensitivity until survival, fiducial acceptance and
+backgrounds plus physical model and numerical convergence
+are established.
